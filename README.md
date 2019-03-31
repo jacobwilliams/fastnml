@@ -1,6 +1,8 @@
 Just some experiments using Python multiprocessing to read many namelists in parallel.
 
-### Results
+Uses [f90nml](https://github.com/marshallward/f90nml).
+
+### Results for sample file
 
 ```
 -----------------------------
