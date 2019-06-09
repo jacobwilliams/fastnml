@@ -9,59 +9,65 @@ Uses [f90nml](https://github.com/marshallward/f90nml).
  reading it all at once from file:
 -----------------------------
 
-6.814043045043945 sec
+7.988389253616333 sec
 
 -----------------------------
  reading it all at once from string:
 -----------------------------
 
-6.754244089126587 sec
+7.9564528465271 sec
 
 -----------------------------
- reading it in parallel:
+ reading chunks without threads:
+-----------------------------
+
+3.159278631210327 sec
+
+-----------------------------
+ reading chunks in parallel:
 -----------------------------
 
 using 1 threads.
-2.543579339981079 sec
+3.38427996635437 sec
 
 
 -----------------------------
- reading it in parallel:
+ reading chunks in parallel:
 -----------------------------
 
 using 2 threads.
-1.4157969951629639 sec
+1.7325119972229004 sec
 
 
 -----------------------------
- reading it in parallel:
+ reading chunks in parallel:
 -----------------------------
 
 using 3 threads.
-0.9900557994842529 sec
+1.227613925933838 sec
 
 
 -----------------------------
- reading it in parallel:
+ reading chunks in parallel:
 -----------------------------
 
 using 4 threads.
-0.8005549907684326 sec
+1.0094490051269531 sec
 
 
 -----------------------------
- reading it in parallel:
+ reading chunks in parallel:
 -----------------------------
 
 using 5 threads.
-0.8011331558227539 sec
+1.0116667747497559 sec
 
 
 -----------------------------
- reading it in parallel:
+ reading chunks in parallel:
 -----------------------------
 
 using 6 threads.
-0.8105840682983398 sec
+1.028597116470337 sec
 
 ```

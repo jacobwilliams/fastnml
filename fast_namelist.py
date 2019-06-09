@@ -5,12 +5,38 @@ import time
 
 #####################################
 def read_a_namelist(str,parser):
-    #nml = parser.reads(str)          # ... not in official release yet ...
-    nml = parser._readstream(iter(str.splitlines()),{})
+    try:
+        nml = parser.reads(str)  # f90nml 1.1
+    except:
+        nml = parser._readstream(iter(str.splitlines()),{})  # previous version
     return nml
 
 #####################################
-def split_namelist(filename):
+def split_namelist_str(str):
+    """ alternate version of split_namelist_file with the string as an input """
+    namelists = []
+    i = -1
+    started=False
+    f = str.split('\n')
+    for line in f:
+        line = line.strip()
+        if (len(line)>0):
+            if (line[0:1]!='!'):
+                if (line[0:1]=='&'): # start a namelist
+                    i = i + 1
+                    namelists.append('')
+                    started = True
+                elif (line[0:1]=='/'): # end a namelist
+                    started = False
+                    namelists[i] = namelists[i] + line + '\n'
+                    continue
+                if started:
+                    namelists[i] = namelists[i] + line + '\n'
+    return namelists
+
+#####################################
+def split_namelist_file(filename):
+    """ split a namelist file into an array of namelist strings """
     namelists = []
     i = -1
     started=False
@@ -37,7 +63,10 @@ def read_namelist_fast(filename,n_threads=4):
     parser = f90nml.Parser()
     parser.global_start_index = 1  # need this for my use cases
 
-    namelists = split_namelist(filename)
+    namelists = split_namelist_file(filename)
+    # with open(filename,'r') as f:
+    #     full_namelist_str = f.read()
+    # namelists = split_namelist_str(full_namelist_str)
 
     n_threads = max(1,min(mp.cpu_count(),n_threads))
     print('using '+str(n_threads)+' threads.')
@@ -52,6 +81,40 @@ def read_namelist_fast(filename,n_threads=4):
     nml = f90nml.Namelist({})
     for r in results:
         for key, value in r.get().items():
+            if key in nml:
+                # array of namelists:
+                if isinstance(nml[key],list):
+                    nml[key].append(value)
+                else:
+                    nml[key] = [nml[key], value]
+            else:
+                nml[key] = value
+
+    return nml
+
+#####################################
+def read_namelist_fast_nothreads(filename):
+
+    """ alternate version of read_namelist_fast that doesn't
+        use threads.
+    """
+
+    parser = f90nml.Parser()
+    parser.global_start_index = 1  # need this for my use cases
+
+    namelists = split_namelist_file(filename)
+    # with open(filename,'r') as f:
+    #     full_namelist_str = f.read()
+    # namelists = split_namelist_str(full_namelist_str)
+
+    results = []
+    for s in namelists:
+        results.append(read_a_namelist(s,parser))
+
+    # create a single namelist from the results:
+    nml = f90nml.Namelist({})
+    for r in results:
+        for key, value in r.items():
             if key in nml:
                 # array of namelists:
                 if isinstance(nml[key],list):
@@ -113,16 +176,35 @@ if __name__ == "__main__":
 
     ##################
 
+
+    print('')
+    print('-----------------------------')
+    print(' reading chunks without threads:')
+    print('-----------------------------')
+    print('')
+    start_time = time.time()
+
+    nml = read_namelist_fast_nothreads(filename)
+
+    end_time = time.time()
+    print(str(end_time-start_time) + ' sec')
+
+    # print('')
+    # print(nml)
+
+
+    ##################
+
     for n_threads in range(1,7):
 
         print('')
         print('-----------------------------')
-        print(' reading it in parallel:')
+        print(' reading chunks in parallel:')
         print('-----------------------------')
         print('')
         start_time = time.time()
 
-        res = read_namelist_fast(filename, n_threads=n_threads)
+        nml = read_namelist_fast(filename, n_threads=n_threads)
         end_time = time.time()
         print(str(end_time-start_time) + ' sec')
 
