@@ -133,9 +133,10 @@ if __name__ == "__main__":
 
     """ test case """
 
-    #filename = 'files/test.nml'       # 112 namelists -- all strings [8 sec]
-    filename = 'files/test4.nml'       # 112 namelists -- all strings -- longer keys w/ array [42 sec]
+    filename = 'files/test.nml'       # 112 namelists -- all strings [8 sec]
+    #filename = 'files/test4.nml'       # 112 namelists -- all strings -- longer keys w/ (2) [42 sec]
     #filename = 'files/test4b.nml'     # 112 namelists -- all strings -- longer keys no array  [9 sec]
+    #filename = 'files/test4c.nml'     # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
 
     ##################
 
