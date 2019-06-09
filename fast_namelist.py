@@ -55,6 +55,8 @@ def split_namelist_file(filename):
                         continue
                     if started:
                         namelists[i] = namelists[i] + line + '\n'
+
+    print(str(len(namelists))+' namelists found in file.')
     return namelists
 
 #####################################
@@ -131,7 +133,9 @@ if __name__ == "__main__":
 
     """ test case """
 
-    filename = 'files/test.nml'
+    #filename = 'files/test.nml'       # 112 namelists -- all strings [8 sec]
+    filename = 'files/test4.nml'       # 112 namelists -- all strings -- longer keys w/ array [42 sec]
+    #filename = 'files/test4b.nml'     # 112 namelists -- all strings -- longer keys no array  [9 sec]
 
     ##################
 
@@ -153,7 +157,6 @@ if __name__ == "__main__":
     # print(nml)
 
     ##################
-
 
     print('')
     print('-----------------------------')
