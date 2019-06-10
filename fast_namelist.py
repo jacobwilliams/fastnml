@@ -2,13 +2,188 @@
 import f90nml
 import multiprocessing as mp
 import time
+import re
+import json
+import sys
+
+###############################################################################
+def get_array_index(str):
+    """
+        If the variable name represents an array element (e.g., 'VAR(1)'),
+        then return the array index (1-based) and the variable name.
+        Otherwise, return None.
+    """
+
+    str = str.strip()
+
+    re1 = '((?:[a-z][a-z0-9_]*))' # Variable Name
+    re2 = '(\\()'                 # '(' Character
+    re3 = '(\\d+)'                # Integer Number
+    re4 = '(\\))'                 # ')' Character
+    re5 = '(.*)'                  # remaining string (should be empty)
+
+    rg = re.compile(re1 + re2 + re3 + re4 + re5, re.IGNORECASE | re.DOTALL)
+    m = rg.search(str)
+    if m:
+        if (m.group(5) == ''):
+            return int(m.group(3)), m.group(1)  # index, arrayname
+        else:
+            # invalid array string
+            return None, None
+    else:
+        return None, None
+
+###############################################################################
+def pathSet(dictionary, path, value, sep='%'):
+    '''
+        Sets a variable in a dictionary, given the namelist path string.
+        Assumes the input path uses Fortran-style 1-based indexing of arrays
+    '''
+
+    path = path.split(sep)
+    key = path[-1]
+    dictionary = pathGet(dictionary, sep.join(path[:-1]), sep=sep)
+    i, arrayname = get_array_index(key)
+    if (i is not None):
+        # it is an array element:
+        if (arrayname not in dictionary):
+            dictionary[arrayname] = [None]
+        if len(dictionary[arrayname])<i:
+            # have to add this element
+            for j in range(len(dictionary[arrayname]),i):
+                dictionary[arrayname].append(None)
+        dictionary[arrayname][i - 1] = value
+    else:
+        # it is just a normal variable:
+        dictionary[key] = value
+
+###############################################################################
+def pathGet(dictionary, path, sep='%'):
+    '''
+        Returns an item in a dictionary given the namelist path string.
+        Assumes the input path uses Fortran-style 1-based indexing of arrays
+    '''
+
+    for item in path.split(sep):
+        i, arrayname = get_array_index(item)
+        if (i is not None):
+            # it is an array element:
+            # create this item since it isn't there
+            if (arrayname not in dictionary):
+                dictionary[arrayname] = [None]
+            if len(dictionary[arrayname])<i:
+                # have to add this element
+                for j in range(len(dictionary[arrayname]),i):
+                    dictionary[arrayname].append(None)
+
+            # make sure it's a dict:
+            if (not isinstance(dictionary[arrayname][i - 1],dict)):
+                dictionary[arrayname][i - 1] = f90nml.Namelist({})
+
+            dictionary = dictionary[arrayname][i - 1]
+
+        else:
+            # it is just a normal variable:
+
+            # make sure it's a dict:
+            if (not isinstance(dictionary,dict)):
+                dictionary = f90nml.Namelist({})
+
+            if (item not in dictionary):
+                dictionary[item] = f90nml.Namelist({})
+
+            dictionary = dictionary[item]
+
+    return dictionary
 
 #####################################
 def read_a_namelist(str,parser):
+    """ using f90nml """
     try:
         nml = parser.reads(str)  # f90nml 1.1
     except:
         nml = parser._readstream(iter(str.splitlines()),{})  # previous version
+    return nml
+
+#####################################
+def string_to_number(s):
+    try:
+        return int(s)
+    except:
+        try:
+            return float(s)
+        except:
+            return None
+
+#####################################
+def nml_value_to_python_value(value):
+
+    value_str = value.strip()
+
+    if (value_str.lower().strip('.')=='true' or value_str.lower().strip('.')=='t'):
+        # logical
+        value = True
+    elif (value_str.lower().strip('.')=='false' or value_str.lower().strip('.')=='f'):
+        # logical
+        value = False
+    elif (value_str[0]=='"' and value_str[-1]=='"'):
+        # string
+        value = value_str.strip('"')
+    elif (value_str[0]=="'" and value_str[-1]=="'"):
+        # string
+        value = value_str.strip("'")
+    else:
+        # int or double:
+        value_num = string_to_number(value_str)
+        if value_num != None:
+            value = value_num # int or double
+        else:
+            value = value_str # just keep it as a string
+
+    return value
+
+#####################################
+def read_a_namelist_simple(str):
+
+    """ simple parser. assumes each variable is declaraed on a single line.
+        For example:
+        ```
+            val%a(2)%b = value,
+        ```
+    """
+
+    nml = None
+    lines = str.splitlines()
+
+    for i,line in enumerate(lines):
+
+        if i==0:
+            # create namelist dict:
+            namelist_name = line.strip().lstrip('&').strip().lower()
+            nml = f90nml.Namelist({namelist_name: f90nml.Namelist({})})
+        else:
+
+            line = line.strip()
+
+            # skip blank and comment lines:
+            if (line==''):
+                continue
+            if (line[0]=='!'):
+                cycle
+
+            d = line.split('=', 1)
+
+            if (len(d)<2):
+                continue
+
+            path = d[0].strip()
+
+            # convert the string to a Python value:
+            value = nml_value_to_python_value(d[1].strip().rstrip(','))
+
+            # add this value to the namelist:
+            pathSet(nml[namelist_name], path, value)
+
     return nml
 
 #####################################
@@ -21,8 +196,8 @@ def split_namelist_str(str):
     for line in f:
         line = line.strip()
         if (len(line)>0):
-            if (line[0:1]!='!'):
-                if (line[0:1]=='&'): # start a namelist
+            if (line[0]!='!'):
+                if (line[0]=='&'): # start a namelist
                     i = i + 1
                     namelists.append('')
                     started = True
@@ -75,7 +250,9 @@ def read_namelist_fast(filename,n_threads=4):
     pool = mp.Pool(processes=n_threads)
     results = []
     for s in namelists:
-        results.append(pool.apply_async(read_a_namelist,(s,parser)))
+        #results.append(pool.apply_async(read_a_namelist,(s,parser)))
+        results.append(pool.apply_async(read_a_namelist_simple,(s,)))   ## test ##
+
     pool.close()
     pool.join()
 
@@ -111,7 +288,8 @@ def read_namelist_fast_nothreads(filename):
 
     results = []
     for s in namelists:
-        results.append(read_a_namelist(s,parser))
+        #results.append(read_a_namelist(s,parser))
+        results.append(read_a_namelist_simple(s))    ## test ##
 
     # create a single namelist from the results:
     nml = f90nml.Namelist({})
@@ -128,6 +306,70 @@ def read_namelist_fast_nothreads(filename):
 
     return nml
 
+
+#####################################
+def traverse_dict(d,path='',index=0,sep='%'):
+
+    """ traverse a dict and print the paths to each variable in namelist style """
+
+    if isinstance(d, dict):
+        for k,v in d.items():
+            if isinstance(v, list):
+                for element in v:
+                    index = index + 1
+                    path_tmp = k+'('+str(index)+')'
+                    if path.strip() != '':
+                        path_tmp = path+sep+path_tmp
+                    traverse_dict(element,path_tmp,index)
+            else:
+                path_tmp = k
+                if path.strip() != '':
+                    path_tmp = path+sep+path_tmp
+                traverse_dict(v,path_tmp)
+    elif isinstance(d, list):
+        for element in d:
+            traverse_dict(element,path)
+    else:
+        path = path.lower()
+        if (d == None):
+            pass
+        elif isinstance(d, str):
+            print(' '+path+" = '"+d+"'"+',')
+        elif isinstance(d, bool):
+            print(' '+path+' = '+['F','T'][int(d)]+',')
+        elif isinstance(d, int):
+            print(' '+path+' = '+str(d)+',')
+        elif isinstance(d,float):
+            print(' '+path+' = '+'{:.17E}'.format(d)+',')
+
+#####################################
+def print_namelist(namelist_name, d):
+
+    #print('!=========================================================================================')
+    print('&'+namelist_name.lower())
+    traverse_dict(d)
+    print('/')
+    #print('!=========================================================================================')
+    print('')
+
+#####################################
+def print_namelists(d):
+
+    """ Print a dict as a namelist file.
+        Assumes an f90nml namelist style structure.
+        It is a dict of dicts (some of which can be lists)
+
+        This uses the "simple" format, with one variable per line.
+    """
+
+    for k,v in d.items():
+        if isinstance(v, list):
+            for element in v:
+                print_namelist(k,element)
+        elif isinstance(v, dict):
+            print_namelist(k,v)
+
+
 ########################################################################
 if __name__ == "__main__":
 
@@ -137,6 +379,35 @@ if __name__ == "__main__":
     #filename = 'files/test4.nml'       # 112 namelists -- all strings -- longer keys w/ (2) [42 sec]
     #filename = 'files/test4b.nml'     # 112 namelists -- all strings -- longer keys no array  [9 sec]
     #filename = 'files/test4c.nml'     # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
+
+
+    ##################
+
+    print('')
+    print('-----------------------------')
+    print(' print a sample namelist:')
+    print('-----------------------------')
+    print('')
+
+    d = {  "globvars": {
+        "a": {
+            "TF": True,
+            "REAL": 2.0,
+            "int": 146,
+            "str": "string",
+            "list": [
+                "a",
+                "b",
+                None,
+                "d",
+                "e"
+                ]
+            }
+        },
+        "morevars": [{"name":1},{"name":2}]
+    }
+
+    print_namelists(d)
 
     ##################
 
@@ -152,33 +423,41 @@ if __name__ == "__main__":
     nml = p.read(filename)
 
     end_time = time.time()
-    print(str(end_time-start_time) + ' sec')
 
     # print('')
     # print(nml)
+    print_namelists(nml)
 
-    ##################
-
-    print('')
-    print('-----------------------------')
-    print(' reading it all at once from string:')
-    print('-----------------------------')
-    print('')
-    start_time = time.time()
-
-    p = f90nml.Parser()
-    p.global_start_index = 1
-    with open(filename,'r') as f:
-        s = f.read()
-        nml = p._readstream(iter(s.splitlines()),{})
-
-    end_time = time.time()
     print(str(end_time-start_time) + ' sec')
 
-    # print('')
-    # print(nml)
+    with open('dump_f90nml.json', 'w') as f:
+        json.dump(nml,f,indent=2)
 
     ##################
+
+    # print('')
+    # print('-----------------------------')
+    # print(' reading it all at once from string:')
+    # print('-----------------------------')
+    # print('')
+    # start_time = time.time()
+
+    # p = f90nml.Parser()
+    # p.global_start_index = 1
+    # with open(filename,'r') as f:
+    #     s = f.read()
+    #     nml = p._readstream(iter(s.splitlines()),{})
+
+    # end_time = time.time()
+    # print(str(end_time-start_time) + ' sec')
+
+    # with open('dump_f90nml.json', 'w') as f:
+    #     json.dump(nml,f,indent=2)
+
+    # # print('')
+    # # print(nml)
+
+    # ##################
 
 
     print('')
@@ -193,9 +472,13 @@ if __name__ == "__main__":
     end_time = time.time()
     print(str(end_time-start_time) + ' sec')
 
-    # print('')
-    # print(nml)
+    with open('dump_simple.json', 'w') as f:
+        json.dump(nml,f,indent=2)
 
+    #print('')
+    #print(nml)
+
+    #sys.exit(-1)
 
     ##################
 
