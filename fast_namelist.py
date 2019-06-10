@@ -120,10 +120,12 @@ def nml_value_to_python_value(value):
 
     value_str = value.strip()
 
-    if (value_str.lower().strip('.')=='true' or value_str.lower().strip('.')=='t'):
+    value_str_bool = value_str.lower().strip('.')
+
+    if (value_str_bool=='true' or value_str_bool=='t'):
         # logical
         value = True
-    elif (value_str.lower().strip('.')=='false' or value_str.lower().strip('.')=='f'):
+    elif (value_str_bool=='false' or value_str_bool=='f'):
         # logical
         value = False
     elif (value_str[0]=='"' and value_str[-1]=='"'):
@@ -143,33 +145,23 @@ def nml_value_to_python_value(value):
     return value
 
 #####################################
-def read_a_namelist_simple(str):
+def read_a_namelist_simple(lines):
 
-    """ simple parser. assumes each variable is declaraed on a single line.
-        For example:
-        ```
-            val%a(2)%b = value,
-        ```
+    """ simple parser. assumes each variable is declared on a single line.
+        For example: `val%a(2)%b = value,`
+
+        Note that comment lines and blank lines have already been removed.
     """
 
     nml = None
-    lines = str.splitlines()
 
     for i,line in enumerate(lines):
 
         if i==0:
             # create namelist dict:
-            namelist_name = line.strip().lstrip('&').strip().lower()
+            namelist_name = line.lstrip('&').strip().lower()
             nml = f90nml.Namelist({namelist_name: f90nml.Namelist({})})
         else:
-
-            line = line.strip()
-
-            # skip blank and comment lines:
-            if (line==''):
-                continue
-            if (line[0]=='!'):
-                cycle
 
             d = line.split('=', 1)
 
@@ -179,7 +171,7 @@ def read_a_namelist_simple(str):
             path = d[0].strip()
 
             # convert the string to a Python value:
-            value = nml_value_to_python_value(d[1].strip().rstrip(','))
+            value = nml_value_to_python_value(d[1].rstrip(', '))
 
             # add this value to the namelist:
             pathSet(nml[namelist_name], path, value)
@@ -199,14 +191,14 @@ def split_namelist_str(str):
             if (line[0]!='!'):
                 if (line[0]=='&'): # start a namelist
                     i = i + 1
-                    namelists.append('')
+                    namelists.append([])
                     started = True
                 elif (line[0:1]=='/'): # end a namelist
                     started = False
-                    namelists[i] = namelists[i] + line + '\n'
+                    namelists[i].append( line )
                     continue
                 if started:
-                    namelists[i] = namelists[i] + line + '\n'
+                    namelists[i].append( line )
     return namelists
 
 #####################################
@@ -219,17 +211,17 @@ def split_namelist_file(filename):
         for line in f:
             line = line.strip()
             if (len(line)>0):
-                if (line[0:1]!='!'):
-                    if (line[0:1]=='&'): # start a namelist
+                if (line[0]!='!'):
+                    if (line[0]=='&'): # start a namelist
                         i = i + 1
-                        namelists.append('')
+                        namelists.append([])
                         started = True
                     elif (line[0:1]=='/'): # end a namelist
                         started = False
-                        namelists[i] = namelists[i] + line + '\n'
+                        namelists[i].append( line )
                         continue
                     if started:
-                        namelists[i] = namelists[i] + line + '\n'
+                        namelists[i].append( line )
 
     print(str(len(namelists))+' namelists found in file.')
     return namelists
@@ -281,15 +273,33 @@ def read_namelist_fast_nothreads(filename):
     parser = f90nml.Parser()
     parser.global_start_index = 1  # need this for my use cases
 
+    #... example run times:
+    # split: 0.0310819149017334 sec
+    # parse: 1.3101840019226074 sec
+    # join: 0.0004949569702148438 sec
+
+    start_time = time.time()
+
     namelists = split_namelist_file(filename)
+
+    end_time = time.time()
+    print('  split: ' + str(end_time-start_time) + ' sec')
+
     # with open(filename,'r') as f:
     #     full_namelist_str = f.read()
     # namelists = split_namelist_str(full_namelist_str)
+
+    start_time = time.time()
 
     results = []
     for s in namelists:
         #results.append(read_a_namelist(s,parser))
         results.append(read_a_namelist_simple(s))    ## test ##
+
+    end_time = time.time()
+    print('  parse: ' + str(end_time-start_time) + ' sec')
+
+    start_time = time.time()
 
     # create a single namelist from the results:
     nml = f90nml.Namelist({})
@@ -304,11 +314,14 @@ def read_namelist_fast_nothreads(filename):
             else:
                 nml[key] = value
 
+    end_time = time.time()
+    print('  join: ' + str(end_time-start_time) + ' sec')
+
     return nml
 
 
 #####################################
-def traverse_dict(d,path='',index=0,sep='%'):
+def traverse_dict(f,d,path='',index=0,sep='%'):
 
     """ traverse a dict and print the paths to each variable in namelist style """
 
@@ -320,40 +333,40 @@ def traverse_dict(d,path='',index=0,sep='%'):
                     path_tmp = k+'('+str(index)+')'
                     if path.strip() != '':
                         path_tmp = path+sep+path_tmp
-                    traverse_dict(element,path_tmp,index)
+                    traverse_dict(f,element,path_tmp,index)
             else:
                 path_tmp = k
                 if path.strip() != '':
                     path_tmp = path+sep+path_tmp
-                traverse_dict(v,path_tmp)
+                traverse_dict(f,v,path_tmp)
     elif isinstance(d, list):
         for element in d:
-            traverse_dict(element,path)
+            traverse_dict(f,element,path)
     else:
         path = path.lower()
         if (d == None):
             pass
         elif isinstance(d, str):
-            print(' '+path+" = '"+d+"'"+',')
+            f.write(' '+path+" = '"+d+"'"+',\n')
         elif isinstance(d, bool):
-            print(' '+path+' = '+['F','T'][int(d)]+',')
+            f.write(' '+path+' = '+['F','T'][int(d)]+',\n')
         elif isinstance(d, int):
-            print(' '+path+' = '+str(d)+',')
+            f.write(' '+path+' = '+str(d)+',\n')
         elif isinstance(d,float):
-            print(' '+path+' = '+'{:.17E}'.format(d)+',')
+            f.write(' '+path+' = '+'{:.17E}'.format(d)+',\n')
 
 #####################################
-def print_namelist(namelist_name, d):
+def print_namelist(f,namelist_name, d):
 
-    #print('!=========================================================================================')
-    print('&'+namelist_name.lower())
-    traverse_dict(d)
-    print('/')
-    #print('!=========================================================================================')
-    print('')
+    #f.write('!=========================================================================================\n')
+    f.write('&'+namelist_name.lower()+'\n')
+    traverse_dict(f,d)
+    f.write('/\n')
+    #f.write('!=========================================================================================\n')
+    f.write('\n')
 
 #####################################
-def print_namelists(d):
+def print_namelists(d,filename):
 
     """ Print a dict as a namelist file.
         Assumes an f90nml namelist style structure.
@@ -362,12 +375,13 @@ def print_namelists(d):
         This uses the "simple" format, with one variable per line.
     """
 
-    for k,v in d.items():
-        if isinstance(v, list):
-            for element in v:
-                print_namelist(k,element)
-        elif isinstance(v, dict):
-            print_namelist(k,v)
+    with open (filename,'w') as f:
+        for k,v in d.items():
+            if isinstance(v, list):
+                for element in v:
+                    print_namelist(f,k,element)
+            elif isinstance(v, dict):
+                print_namelist(f,k,v)
 
 
 ########################################################################
@@ -380,6 +394,7 @@ if __name__ == "__main__":
     #filename = 'files/test4b.nml'     # 112 namelists -- all strings -- longer keys no array  [9 sec]
     #filename = 'files/test4c.nml'     # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
 
+    # filename = 'files/test2.ideck'
 
     ##################
 
@@ -407,7 +422,7 @@ if __name__ == "__main__":
         "morevars": [{"name":1},{"name":2}]
     }
 
-    print_namelists(d)
+    print_namelists(d,'sample.nml')
 
     ##################
 
@@ -426,7 +441,7 @@ if __name__ == "__main__":
 
     # print('')
     # print(nml)
-    print_namelists(nml)
+    print_namelists(nml,filename+'_reprint')
 
     print(str(end_time-start_time) + ' sec')
 
