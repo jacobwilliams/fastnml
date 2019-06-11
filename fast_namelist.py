@@ -321,19 +321,20 @@ def read_namelist_fast_nothreads(filename):
 
 
 #####################################
-def traverse_dict(f,d,path='',index=0,sep='%'):
+def traverse_dict(f,d,path='',sep='%'):
 
     """ traverse a dict and print the paths to each variable in namelist style """
 
     if isinstance(d, dict):
         for k,v in d.items():
             if isinstance(v, list):
+                index = 0
                 for element in v:
                     index = index + 1
                     path_tmp = k+'('+str(index)+')'
                     if path.strip() != '':
                         path_tmp = path+sep+path_tmp
-                    traverse_dict(f,element,path_tmp,index)
+                    traverse_dict(f,element,path_tmp)
             else:
                 path_tmp = k
                 if path.strip() != '':
@@ -409,6 +410,9 @@ if __name__ == "__main__":
             "TF": True,
             "REAL": 2.0,
             "int": 146,
+            "array1": [1,2],
+            "array2": [1,2],
+            "array3": [1,2],
             "str": "string",
             "list": [
                 "a",
