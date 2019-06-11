@@ -14,16 +14,13 @@ def get_array_index(str):
         Otherwise, return None.
     """
 
-    str = str.strip()
+    # initial quick check:
+    if '(' not in str:
+        return None, None
 
-    re1 = '((?:[a-z][a-z0-9_]*))' # Variable Name
-    re2 = '(\\()'                 # '(' Character
-    re3 = '(\\d+)'                # Integer Number
-    re4 = '(\\))'                 # ')' Character
-    re5 = '(.*)'                  # remaining string (should be empty)
+    array_rg = re.compile('((?:[a-z][a-z0-9_]*))(\\()(\\d+)(\\))(.*)', re.IGNORECASE | re.DOTALL)
 
-    rg = re.compile(re1 + re2 + re3 + re4 + re5, re.IGNORECASE | re.DOTALL)
-    m = rg.search(str)
+    m = array_rg.search(str.strip())
     if m:
         if (m.group(5) == ''):
             return int(m.group(3)), m.group(1)  # index, arrayname
@@ -122,10 +119,10 @@ def nml_value_to_python_value(value):
 
     value_str_bool = value_str.lower().strip('.')
 
-    if (value_str_bool=='true' or value_str_bool=='t'):
+    if (value_str_bool=='t' or value_str_bool=='true'):
         # logical
         value = True
-    elif (value_str_bool=='false' or value_str_bool=='f'):
+    elif (value_str_bool=='f' or value_str_bool=='false'):
         # logical
         value = False
     elif (value_str[0]=='"' and value_str[-1]=='"'):
@@ -278,28 +275,28 @@ def read_namelist_fast_nothreads(filename):
     # parse: 1.3101840019226074 sec
     # join: 0.0004949569702148438 sec
 
-    start_time = time.time()
+    #start_time = time.time()
 
     namelists = split_namelist_file(filename)
 
-    end_time = time.time()
-    print('  split: ' + str(end_time-start_time) + ' sec')
+    #end_time = time.time()
+    #print('  split: ' + str(end_time-start_time) + ' sec')
 
     # with open(filename,'r') as f:
     #     full_namelist_str = f.read()
     # namelists = split_namelist_str(full_namelist_str)
 
-    start_time = time.time()
+    #start_time = time.time()
 
     results = []
     for s in namelists:
         #results.append(read_a_namelist(s,parser))
         results.append(read_a_namelist_simple(s))    ## test ##
 
-    end_time = time.time()
-    print('  parse: ' + str(end_time-start_time) + ' sec')
+    #end_time = time.time()
+    #print('  parse: ' + str(end_time-start_time) + ' sec')
 
-    start_time = time.time()
+    #start_time = time.time()
 
     # create a single namelist from the results:
     nml = f90nml.Namelist({})
@@ -314,8 +311,8 @@ def read_namelist_fast_nothreads(filename):
             else:
                 nml[key] = value
 
-    end_time = time.time()
-    print('  join: ' + str(end_time-start_time) + ' sec')
+    #end_time = time.time()
+    #print('  join: ' + str(end_time-start_time) + ' sec')
 
     return nml
 
@@ -395,7 +392,7 @@ if __name__ == "__main__":
     #filename = 'files/test4b.nml'     # 112 namelists -- all strings -- longer keys no array  [9 sec]
     #filename = 'files/test4c.nml'     # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
 
-    # filename = 'files/test2.ideck'
+    #filename = 'files/test2.ideck'
 
     ##################
 
