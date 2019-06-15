@@ -150,27 +150,21 @@ def read_a_namelist_simple(lines):
         Note that comment lines and blank lines have already been removed.
     """
 
-    nml = None
+    # create namelist dict:
+    namelist_name = lines[0].lstrip('&').strip().lower()
+    nml = f90nml.Namelist({namelist_name: f90nml.Namelist({})})
 
-    for i,line in enumerate(lines):
+    for line in lines[1:]:
 
-        if i==0:
-            # create namelist dict:
-            namelist_name = line.lstrip('&').strip().lower()
-            nml = f90nml.Namelist({namelist_name: f90nml.Namelist({})})
-        else:
+        d = line.split('=', 1)
 
-            d = line.split('=', 1)
-
-            if (len(d)<2):
-                continue
-
-            path = d[0].strip()
+        if (len(d)>=2):
 
             # convert the string to a Python value:
             value = nml_value_to_python_value(d[1].rstrip(', '))
 
             # add this value to the namelist:
+            path = d[0].strip()
             pathSet(nml[namelist_name], path, value)
 
     return nml
@@ -220,11 +214,11 @@ def split_namelist_file(filename):
                     if started:
                         namelists[i].append( line )
 
-    print(str(len(namelists))+' namelists found in file.')
+    #print(str(len(namelists))+' namelists found in file.')
     return namelists
 
 #####################################
-def read_namelist_fast(filename,n_threads=4):
+def read_namelist_fast(filename,n_threads=4,simple=True):
 
     parser = f90nml.Parser()
     parser.global_start_index = 1  # need this for my use cases
@@ -235,12 +229,14 @@ def read_namelist_fast(filename,n_threads=4):
     # namelists = split_namelist_str(full_namelist_str)
 
     n_threads = max(1,min(mp.cpu_count(),n_threads))
-    print('using '+str(n_threads)+' threads.')
+    #print('using '+str(n_threads)+' threads.')
     pool = mp.Pool(processes=n_threads)
     results = []
     for s in namelists:
-        #results.append(pool.apply_async(read_a_namelist,(s,parser)))
-        results.append(pool.apply_async(read_a_namelist_simple,(s,)))   ## test ##
+        if simple:
+            results.append(pool.apply_async(read_a_namelist_simple,(s,)))
+        else:
+            results.append(pool.apply_async(read_a_namelist,(''.join(s),parser)))
 
     pool.close()
     pool.join()
@@ -261,7 +257,7 @@ def read_namelist_fast(filename,n_threads=4):
     return nml
 
 #####################################
-def read_namelist_fast_nothreads(filename):
+def read_namelist_fast_nothreads(filename,simple=True):
 
     """ alternate version of read_namelist_fast that doesn't
         use threads.
@@ -275,28 +271,18 @@ def read_namelist_fast_nothreads(filename):
     # parse: 1.3101840019226074 sec
     # join: 0.0004949569702148438 sec
 
-    #start_time = time.time()
-
     namelists = split_namelist_file(filename)
-
-    #end_time = time.time()
-    #print('  split: ' + str(end_time-start_time) + ' sec')
 
     # with open(filename,'r') as f:
     #     full_namelist_str = f.read()
     # namelists = split_namelist_str(full_namelist_str)
 
-    #start_time = time.time()
-
     results = []
     for s in namelists:
-        #results.append(read_a_namelist(s,parser))
-        results.append(read_a_namelist_simple(s))    ## test ##
-
-    #end_time = time.time()
-    #print('  parse: ' + str(end_time-start_time) + ' sec')
-
-    #start_time = time.time()
+        if simple:
+            results.append(read_a_namelist_simple(s))
+        else:
+            results.append(read_a_namelist(''.join(s),parser))
 
     # create a single namelist from the results:
     nml = f90nml.Namelist({})
@@ -311,11 +297,7 @@ def read_namelist_fast_nothreads(filename):
             else:
                 nml[key] = value
 
-    #end_time = time.time()
-    #print('  join: ' + str(end_time-start_time) + ' sec')
-
     return nml
-
 
 #####################################
 def traverse_dict(f,d,path='',sep='%'):
@@ -387,14 +369,46 @@ if __name__ == "__main__":
 
     """ test case """
 
-    filename = 'files/test.nml'       # 112 namelists -- all strings [8 sec]
-    #filename = 'files/test4.nml'       # 112 namelists -- all strings -- longer keys w/ (2) [42 sec]
-    #filename = 'files/test4b.nml'     # 112 namelists -- all strings -- longer keys no array  [9 sec]
-    #filename = 'files/test4c.nml'     # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
+    # filenames to test:
+    filename = 'files/test.nml'      # 112 namelists -- all strings [8 sec]
+    filename1 = 'files/test4.nml'    # 112 namelists -- all strings -- longer keys w/ (2) [42 sec]
+    filename2 = 'files/test4b.nml'   # 112 namelists -- all strings -- longer keys no array  [9 sec]
+    filename3 = 'files/test4c.nml'   # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
 
-    #filename = 'files/test2.ideck'
+    filenames = [filename,filename1,filename2,filename3]
+
+    # cases to run:
+    def read_from_file_f90nml(filename):
+        p = f90nml.Parser()
+        p.global_start_index = 1
+        nml = p.read(filename)
+        return nml
+
+    def read_chunks_without_threads_f90nml(filename):
+        nml = read_namelist_fast_nothreads(filename,simple=False) # use f90nml
+        return nml
+
+    def read_chunks_with_threads_f90nml(filename,n_threads):
+        nml = read_namelist_fast(filename, n_threads=n_threads, simple=False)
+        return nml
+
+    def read_chunks_without_threads_simple(filename):
+        nml = read_namelist_fast_nothreads(filename,simple=True)
+        return nml
+
+    def read_chunks_with_threads_simple(filename,n_threads):
+        nml = read_namelist_fast(filename, n_threads=n_threads, simple=True)
+        return nml
 
     ##################
+
+    n_threads_to_test = 4  # for threading cases
+
+    tests = [('f90nml: Read all at once from file',read_from_file_f90nml,0),
+             ('f90nml: Read in chunks (no threads)',read_chunks_without_threads_f90nml,0),
+             ('f90nml: Read in chunks (threads)',read_chunks_with_threads_f90nml,n_threads_to_test),
+             ('Fast-namelist: Read in chunks (no threads)',read_chunks_without_threads_simple,0),
+             ('Fast-namelist: Read in chunks (threads)',read_chunks_with_threads_simple,n_threads_to_test)]
 
     print('')
     print('-----------------------------')
@@ -429,25 +443,41 @@ if __name__ == "__main__":
 
     print('')
     print('-----------------------------')
-    print(' reading it all at once from file:')
+    print(' run all the tests:')
     print('-----------------------------')
     print('')
-    start_time = time.time()
 
-    p = f90nml.Parser()
-    p.global_start_index = 1
-    nml = p.read(filename)
+    results = {}
 
-    end_time = time.time()
+    for filename in filenames:
+        print('')
+        print('-----------------------------')
+        print(str(filename))
+        print('-----------------------------')
+        print('')
 
-    # print('')
-    # print(nml)
-    print_namelists(nml,filename+'_reprint')
+        for test in tests:
 
-    print(str(end_time-start_time) + ' sec')
+            start_time = time.time()
 
-    with open('dump_f90nml.json', 'w') as f:
-        json.dump(nml,f,indent=2)
+            if (test[2]!=0):
+                for n_threads in range(1,test[2]):
+                    start_time = time.time()
+                    nml = test[1](filename,n_threads)
+                    end_time = time.time()
+                    case = test[0] + f' ({n_threads} threads) : '
+                    print(case.ljust(55) + str(end_time-start_time) + ' sec')
+            else:
+                start_time = time.time()
+                nml = test[1](filename)
+                end_time = time.time()
+                case = test[0] + ' : '
+                print(case.ljust(55) + str(end_time-start_time) + ' sec')
+
+            # print_namelists(nml,filename+'_reprint')
+            # with open('dump.json', 'w') as f:
+            #     json.dump(nml,f,indent=2)
+
 
     ##################
 
@@ -475,43 +505,3 @@ if __name__ == "__main__":
 
     # ##################
 
-
-    print('')
-    print('-----------------------------')
-    print(' reading chunks without threads:')
-    print('-----------------------------')
-    print('')
-    start_time = time.time()
-
-    nml = read_namelist_fast_nothreads(filename)
-
-    end_time = time.time()
-    print(str(end_time-start_time) + ' sec')
-
-    with open('dump_simple.json', 'w') as f:
-        json.dump(nml,f,indent=2)
-
-    #print('')
-    #print(nml)
-
-    #sys.exit(-1)
-
-    ##################
-
-    for n_threads in range(1,7):
-
-        print('')
-        print('-----------------------------')
-        print(' reading chunks in parallel:')
-        print('-----------------------------')
-        print('')
-        start_time = time.time()
-
-        nml = read_namelist_fast(filename, n_threads=n_threads)
-        end_time = time.time()
-        print(str(end_time-start_time) + ' sec')
-
-        # print('')
-        # print(nml)
-
-        print('')
