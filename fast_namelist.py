@@ -327,7 +327,7 @@ def traverse_dict(f,d,path='',sep='%'):
         if (d == None):
             pass
         elif isinstance(d, str):
-            f.write(' '+path+" = '"+d+"'"+',\n')
+            f.write(' '+path+" = '"+d.replace("'","''")+"'"+',\n')
         elif isinstance(d, bool):
             f.write(' '+path+' = '+['F','T'][int(d)]+',\n')
         elif isinstance(d, int):
@@ -424,7 +424,7 @@ if __name__ == "__main__":
             "array1": [1,2],
             "array2": [1,2],
             "array3": [1,2],
-            "str": "string",
+            "str": "string 'with quotes'",
             "list": [
                 "a",
                 "b",
