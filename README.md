@@ -1,12 +1,14 @@
+# fastnml
+
 Just some experiments using Python to read Fortran namelists.
 
 Uses [f90nml](https://github.com/marshallward/f90nml).
 
 The `fast-namelist` code only works with a specific subset of the namelist format. It is not nearly as general or robust as f90nml, but it is much faster when reading very large namelists. Also, both codes are tested using multiprocessing to read many namelists in parallel.
 
-### Test results
+## Test results
 
-```
+```plaintext
 -----------------------------
 files/test.nml
 -----------------------------
