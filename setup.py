@@ -23,5 +23,5 @@ setup(
     keywords='namelist fortran',
     packages=find_packages(exclude=['docs', 'tests']),
     python_requires='>=3.7',
-    install_requires=['f90nml'],
+    install_requires=['f90nml>=1.0.2'],
 )
