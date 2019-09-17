@@ -39,7 +39,7 @@ def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = '%'):
 
     path = path.split(sep)
     key = path[-1]
-    dictionary: dict = _pathGet(dictionary, sep.join(path[:-1]), sep=sep)
+    dictionary = _pathGet(dictionary, sep.join(path[:-1]), sep=sep)
     i, arrayname = _get_array_index(key)
     if (i is not None):
         # it is an array element:
@@ -248,7 +248,7 @@ def read_namelist(filename: str, *, n_threads: int = 4,
 
 def _traverse_value(f: TextIOWrapper, path: str, sep: str, path2: str, d: Any):
     if path.strip() != '':
-        path2 = f"{path}{sep}{path2}"
+        path2 = "{}{}{}".format(path, sep, path2)  # f"{path}{sep}{path2}"
     _traverse_dict(f, d, path2)
 
 
@@ -263,7 +263,9 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
                 index = 0
                 for element in v:
                     index += 1
-                    _traverse_value(f, path, sep, f'{k}({index})', element)
+                    _traverse_value(f, path, sep,  # f'{k}({index})',
+                                    '{}({})'.format(k, index),
+                                    element)
             else:
                 _traverse_value(f, path, sep, k, v)
     elif isinstance(d, list):
@@ -275,17 +277,22 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
             pass
         elif isinstance(d, str):
             s = d.replace("'", "''")
-            f.write(f" {path} = '{s}',\n")
+            # f.write(f" {path} = '{s}',\n")
+            f.write(" {} = '{}',\n".format(path, s))
         elif isinstance(d, bool):
-            f.write(f" {path} = {['F', 'T'][int(d)]},\n")
+            # f.write(f" {path} = {['F', 'T'][int(d)]},\n")
+            f.write(" {} = {},\n".format(path, ['F', 'T'][int(d)]))
         elif isinstance(d, int):
-            f.write(f" {path} = {d},\n")
+            # f.write(f" {path} = {d},\n")
+            f.write(" {} = {},\n".format(path, d))
         elif isinstance(d, float):
-            f.write(f" {path} = {d:.17E},\n")
+            # f.write(f" {path} = {d:.17E},\n")
+            f.write(" {} = {:.17E},\n".format(path, d))
 
 
 def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
-    f.write(f'&{namelist_name.lower()}\n')
+    # f.write(f'&{namelist_name.lower()}\n')
+    f.write('&{}\n'.format(namelist_name.lower()))
     _traverse_dict(f, d)
     f.write('/\n')
     f.write('\n')

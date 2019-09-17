@@ -29,8 +29,10 @@ def run_read_tests(filenames, tests, parser, repeats):
     # disable screensaver
     ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)
 
-    print(f"Each test will be repeated {repeats} times.  "
-          f"Reported times are averages.")
+    # print(f"Each test will be repeated {repeats} times.  "
+    #       f"Reported times are averages.")
+    print(("Each test will be repeated {} times.  "
+           "Reported times are averages.").format(repeats))
 
     for filename in filenames:
         print('')
@@ -42,10 +44,12 @@ def run_read_tests(filenames, tests, parser, repeats):
         for t in tests:
             func, threads = t
             for n_threads in range(0, threads + 1):
-                case = f"{func.__doc__} ({n_threads} threads) : "
+                # case = f"{func.__doc__} ({n_threads} threads) : "
+                case = "{} ({} threads) : ".format(func.__doc__, n_threads)
                 tottime = timeit(lambda: func(filename, n_threads, parser),
                                  number=repeats)
-                print(f"{case.ljust(55)}{tottime/repeats} sec")
+                # print(f"{case.ljust(55)}{tottime/repeats} sec")
+                print("{}{} sec".format(case.ljust(55), tottime/repeats))
 
     # enable screensaver
     ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)
