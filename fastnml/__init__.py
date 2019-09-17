@@ -122,6 +122,7 @@ def _nml_value_to_python_value(value: str) -> _nml_types:
 
 def _read_single_namelist(lines: List[str], parser: Parser,
                           simple: bool) -> Namelist:
+    nml = None
     if simple:
         """
         Simple parser. Assumes one array element per line.
@@ -129,18 +130,21 @@ def _read_single_namelist(lines: List[str], parser: Parser,
 
         Note that comment lines and blank lines have already been removed.
         """
-        namelist_name = lines[0].lstrip('&').strip().lower()
-        nml = Namelist({namelist_name: Namelist({})})
-        for line in lines[1:]:
-            d = line.split('=', 1)
-            if (len(d) >= 2):
-                # convert the string to a Python value:
-                value = _nml_value_to_python_value(d[1].rstrip(', '))
+        try:
+            namelist_name = lines[0].lstrip('&').strip().lower()
+            nml = Namelist({namelist_name: Namelist({})})
+            for line in lines[1:]:
+                d = line.split('=', 1)
+                if (len(d) >= 2):
+                    # convert the string to a Python value:
+                    value = _nml_value_to_python_value(d[1].rstrip(', '))
 
-                # add this value to the namelist:
-                path = d[0].strip()
-                _pathSet(nml[namelist_name], path, value)
-    else:
+                    # add this value to the namelist:
+                    path = d[0].strip()
+                    _pathSet(nml[namelist_name], path, value)
+        except Exception:
+            nml = None
+    if nml is None:
         try:
             nml = parser.reads(''.join(lines))  # f90nml 1.1
         except AttributeError:
