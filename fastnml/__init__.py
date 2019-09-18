@@ -1,4 +1,4 @@
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 import f90nml  # noqa: E402
 assert f90nml
@@ -12,7 +12,9 @@ assert all((
 
 from .writer import (
     save_namelist,
+    write_namelist_to_stream,
 )  # noqa: E402
 assert all((
     save_namelist,
+    write_namelist_to_stream,
 ))

@@ -56,6 +56,15 @@ def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
     f.write('\n')
 
 
+def write_namelist_to_stream(d: dict, file: TextIOWrapper):
+    for k, v in d.items():
+        if isinstance(v, list):
+            for element in v:
+                _print_single_namelist(file, k, element)
+        elif isinstance(v, dict):
+            _print_single_namelist(file, k, v)
+
+
 def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     """
     Print a dict as a namelist file.
@@ -65,11 +74,7 @@ def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     This uses the "simple" format, with one variable per line.
     """
     if isinstance(file, str):
-        file = open(file, 'w')
-    with file:
-        for k, v in d.items():
-            if isinstance(v, list):
-                for element in v:
-                    _print_single_namelist(file, k, element)
-            elif isinstance(v, dict):
-                _print_single_namelist(file, k, v)
+        with open(file, 'w') as file:
+            write_namelist_to_stream(d, file)
+    else:
+        write_namelist_to_stream(d, file)
