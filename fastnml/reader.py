@@ -104,10 +104,12 @@ def _nml_value_to_python_value(value: str) -> _nml_types:
         return False
     elif (value_str[0] == '"' and value_str[-1] == '"'):
         # string
-        return value_str.strip('"')
+        # fortran to python convention
+        return value_str[1:-1].replace('""', '"')
     elif (value_str[0] == "'" and value_str[-1] == "'"):
         # string
-        return value_str.strip("'")
+        # fortran to python convention
+        return value_str[1:-1].replace("''", "'")
     else:
         # int or double:
         try:
