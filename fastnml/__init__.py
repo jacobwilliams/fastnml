@@ -3,7 +3,7 @@ __version__ = '1.0.0'
 import f90nml  # noqa: E402
 assert f90nml
 
-from .reader import (
+from .fast_namelist import (
     read_namelist,
 )  # noqa: E402
 assert all((
