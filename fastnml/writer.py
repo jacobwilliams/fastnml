@@ -1,15 +1,13 @@
 from typing import Union, Any
 from io import TextIOWrapper
 
-# nml_types = Union[int, float, bool, str]
-
-
+###############################################################################
 def _traverse_value(f: TextIOWrapper, path: str, sep: str, path2: str, d: Any):
     if path.strip() != '':
         path2 = "{}{}{}".format(path, sep, path2)  # f"{path}{sep}{path2}"
     _traverse_dict(f, d, path2)
 
-
+###############################################################################
 def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
     """
     traverse a dict and print the paths to each variable in namelist style
@@ -47,7 +45,7 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
             # f.write(f" {path} = {d:.17E},\n")
             f.write(" {} = {:.17E},\n".format(path, d))
 
-
+###############################################################################
 def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
     # f.write(f'&{namelist_name.lower()}\n')
     f.write('&{}\n'.format(namelist_name.lower()))
@@ -55,7 +53,7 @@ def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
     f.write('/\n')
     f.write('\n')
 
-
+###############################################################################
 def write_namelist_to_stream(d: dict, file: TextIOWrapper):
     for k, v in d.items():
         if isinstance(v, list):
@@ -64,7 +62,7 @@ def write_namelist_to_stream(d: dict, file: TextIOWrapper):
         elif isinstance(v, dict):
             _print_single_namelist(file, k, v)
 
-
+###############################################################################
 def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     """
     Print a dict as a namelist file.
