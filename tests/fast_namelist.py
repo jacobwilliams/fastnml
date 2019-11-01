@@ -3,8 +3,6 @@ import f90nml
 import multiprocessing as mp
 import time
 import re
-import json
-import sys
 
 ###############################################################################
 def get_array_index(str):
@@ -370,10 +368,10 @@ if __name__ == "__main__":
     """ test case """
 
     # filenames to test:
-    filename = 'files/test.nml'      # 112 namelists -- all strings [8 sec]
-    filename1 = 'files/test4.nml'    # 112 namelists -- all strings -- longer keys w/ (2) [42 sec]
-    filename2 = 'files/test4b.nml'   # 112 namelists -- all strings -- longer keys no array  [9 sec]
-    filename3 = 'files/test4c.nml'   # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
+    filename = 'test.nml'      # 112 namelists -- all strings [8 sec]
+    filename1 = 'test4.nml'    # 112 namelists -- all strings -- longer keys w/ (2) [42 sec]
+    filename2 = 'test4b.nml'   # 112 namelists -- all strings -- longer keys no array  [9 sec]
+    filename3 = 'test4c.nml'   # 112 namelists -- all strings -- longer keys w/ %  [12 sec]
 
     filenames = [filename,filename1,filename2,filename3]
 
@@ -504,4 +502,3 @@ if __name__ == "__main__":
     # # print(nml)
 
     # ##################
-
