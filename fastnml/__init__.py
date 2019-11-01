@@ -1,4 +1,7 @@
-__version__ = '1.0.0'
+__appname__ = "fastnml"
+__version__ = '1.0.2'
+__credits__ = ["Jacob Williams", "Randy Eckman"]
+__license__ = "BSD"
 
 import f90nml  # noqa: E402
 assert f90nml

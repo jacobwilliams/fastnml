@@ -28,8 +28,8 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/jacobwilliams/fastnml',
-    author='Jacob Williams, Randy Eckman',
-    author_email='jacob@degenerateconic.com, emanspeaks@gmail.com',
+    author='Jacob Williams',
+    author_email='jacob@degenerateconic.com',
     classifiers=[
         'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 3.5',
