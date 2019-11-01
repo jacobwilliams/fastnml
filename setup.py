@@ -15,23 +15,23 @@ def find_version(filename):
     raise RuntimeError("Unable to find version string.")
 
 
-project_version = find_version(ospjoin(here, 'fastnml', '__init__.py'))
+project_version = find_version(ospjoin(here, 'fast-namelist', '__init__.py'))
 
 # Get the long description from the README file
 with open(ospjoin(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='fastnml',
+    name='fast-namelist',
     version=project_version,
     description='A simple fast namelist parser',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    url='https://github.com/emanspeaks/fastnml',
-    author='Randy Eckman',
-    author_email='emanspeaks@gmail.com',
+    url='https://github.com/jacobwilliams/fast-namelist',
+    author='Jacob Williams, Randy Eckman',
+    author_email='jacob@degenerateconic.com, emanspeaks@gmail.com',
     classifiers=[
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: BSD License',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',

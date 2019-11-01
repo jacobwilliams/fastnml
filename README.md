@@ -1,4 +1,4 @@
-# fastnml
+# fast-namelist
 
 A Python library to quickly read Fortran namelists.
 
