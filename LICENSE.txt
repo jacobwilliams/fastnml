@@ -1,5 +1,5 @@
-fast-namelist: Python module for reading and writing Fortran namelists
-https://github.com/jacobwilliams/fast-namelist
+fastnml: Python module for reading and writing Fortran namelists
+https://github.com/jacobwilliams/fastnml
 
 Copyright (c) 2019, Jacob Williams
 All rights reserved.
