@@ -1,5 +1,8 @@
 """ test cases """
 
+import sys
+sys.path.insert(1, '../')
+
 from timeit import timeit
 import ctypes
 import f90nml
@@ -25,9 +28,6 @@ def read_chunks_simple(filename, n_threads, parser):
 
 
 def run_read_tests(filenames, tests, parser, repeats):
-    # screensaver code from https://eddiejackson.net/wp/?p=23435
-    # disable screensaver
-    ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)
 
     # print(f"Each test will be repeated {repeats} times.  "
     #       f"Reported times are averages.")
@@ -50,10 +50,6 @@ def run_read_tests(filenames, tests, parser, repeats):
                                  number=repeats)
                 # print(f"{case.ljust(55)}{tottime/repeats} sec")
                 print("{}{} sec".format(case.ljust(55), tottime/repeats))
-
-    # enable screensaver
-    ctypes.windll.kernel32.SetThreadExecutionState(0x80000000)
-
 
 if __name__ == '__main__':
     print('')

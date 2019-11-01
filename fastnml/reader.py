@@ -200,13 +200,13 @@ def _split_namelist_file(filename: str) -> List[str]:
     return namelists
 
 
-def read_namelist(filename: str, *, n_threads: int = 4,
+def read_namelist(filename: str, *, n_threads: int = 0,
                   parser: Parser = None,
                   simple: bool = True) -> Namelist:
     """
     Read a namelist quickly.
 
-    For non-threaded use, set `n_threads=0`.
+    For threaded use, set `n_threads` to the number of threads.
     """
     nml = Namelist({})
 
