@@ -1,4 +1,4 @@
-__version__ = '0.1.4'
+__version__ = '1.0.0'
 
 import f90nml  # noqa: E402
 assert f90nml
