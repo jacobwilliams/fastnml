@@ -3,6 +3,7 @@ from io import TextIOWrapper
 
 ###############################################################################
 def _traverse_value(f: TextIOWrapper, path: str, sep: str, path2: str, d: Any):
+
     if path.strip() != '':
         path2 = "{}{}{}".format(path, sep, path2)  # f"{path}{sep}{path2}"
     _traverse_dict(f, d, path2)
@@ -47,6 +48,7 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
 
 ###############################################################################
 def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
+
     # f.write(f'&{namelist_name.lower()}\n')
     f.write('&{}\n'.format(namelist_name.lower()))
     _traverse_dict(f, d)
@@ -55,6 +57,7 @@ def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
 
 ###############################################################################
 def write_namelist_to_stream(d: dict, file: TextIOWrapper):
+
     for k, v in d.items():
         if isinstance(v, list):
             for element in v:
@@ -71,6 +74,7 @@ def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
 
     This uses the "simple" format, with one variable per line.
     """
+
     if isinstance(file, str):
         with open(file, 'w') as file:
             write_namelist_to_stream(d, file)

@@ -70,17 +70,17 @@ def _pathGet(dictionary: dict, path: str,
             # create this item since it isn't there
             if (arrayname not in dictionary):
                 dictionary[arrayname] = [None]
-            x = dictionary[arrayname]
-            lenx = len(x)
+            d = dictionary[arrayname]
+            lenx = len(d)
             if lenx < i:
                 # have to add this element
                 for j in range(lenx, i):
-                    x.append(None)
+                    d.append(None)
 
             # make sure it's a dict:
-            if (not isinstance(x[i - 1], dict)):
-                x[i - 1] = Namelist({})
-            dictionary = x[i - 1]
+            if (not isinstance(d[i - 1], dict)):
+                d[i - 1] = Namelist({})
+            dictionary = d[i - 1]
         else:
             # it is just a normal variable:
             # make sure it's a dict first
@@ -94,6 +94,7 @@ def _pathGet(dictionary: dict, path: str,
 
 ###############################################################################
 def _nml_value_to_python_value(value: str) -> _nml_types:
+
     value_str = value.strip()
     value_str_bool = value_str.lower().strip('.')
     if (value_str_bool == 't' or value_str_bool == 'true'):
@@ -123,6 +124,7 @@ def _nml_value_to_python_value(value: str) -> _nml_types:
 ###############################################################################
 def _read_single_namelist(lines: List[str], parser: Parser,
                           simple: bool) -> Namelist:
+
     nml = None
     if simple:
         """
@@ -178,6 +180,7 @@ def _read_single_namelist(lines: List[str], parser: Parser,
 ###############################################################################
 def _split_namelist_file(filename: str) -> List[str]:
     """ split a namelist file into an array of namelist strings """
+
     namelists = list()
     i = -1
     started = False
@@ -208,6 +211,7 @@ def read_namelist(filename: str, *, n_threads: int = 0,
 
     For threaded use, set `n_threads` to the number of threads.
     """
+
     nml = Namelist({})
 
     def _loop_over_results(r):
