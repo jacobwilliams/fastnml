@@ -1,7 +1,7 @@
-from typing import List, Union
+from f90nml import Namelist, Parser
 import multiprocessing as mp
 import re
-from f90nml import Namelist, Parser
+from typing import List, Union
 
 _nml_types = Union[int, float, bool, str]
 _array_rg = re.compile('((?:[a-z][a-z0-9_]*))(\\()(\\d+)(\\))(.*)',
