@@ -1,65 +1,79 @@
-Just some experiments using Python to read Fortran namelists.
+# fast-namelist
 
-Uses [f90nml](https://github.com/marshallward/f90nml).
+A Python library to quickly read Fortran namelists.
 
-The `fast-namelist` code only works with a specific subset of the namelist format. It is not nearly as general or robust as f90nml, but it is much faster when reading very large namelists. Also, both codes are tested using multiprocessing to read many namelists in parallel.
+The `fastnml` code only works with a specific subset of the namelist format. It is not nearly as general or robust as [f90nml](https://github.com/marshallward/f90nml), but it is much faster when reading very large namelists. Also, both codes are tested using multiprocessing to read many namelists in parallel.
 
 ### Test results
 
+Each test was repeated 10 times using `timeit`.  Reported times are averages.
+
+```plaintext
+-----------------------------
+test.nml
+-----------------------------
+
+f90nml: Read all at once from file (0 threads) :       8.583405899999999 sec
+f90nml: Read in chunks (0 threads) :                   4.6838695999999995 sec
+f90nml: Read in chunks (1 threads) :                   4.937748499999998 sec
+f90nml: Read in chunks (2 threads) :                   2.5980871000000008 sec
+f90nml: Read in chunks (3 threads) :                   1.9029447000000026 sec
+f90nml: Read in chunks (4 threads) :                   1.5512989000000026 sec
+fastnml: Read in chunks (0 threads) :                  0.4889088999999984 sec
+fastnml: Read in chunks (1 threads) :                  0.6726308000000003 sec
+fastnml: Read in chunks (2 threads) :                  0.49938099999999963 sec
+fastnml: Read in chunks (3 threads) :                  0.4068599000000006 sec
+fastnml: Read in chunks (4 threads) :                  0.39626249999999885 sec
+
+-----------------------------
+test4.nml
+-----------------------------
+
+f90nml: Read all at once from file (0 threads) :       33.611139800000004 sec
+f90nml: Read in chunks (0 threads) :                   24.9464172 sec
+f90nml: Read in chunks (1 threads) :                   22.7366057 sec
+f90nml: Read in chunks (2 threads) :                   11.587078000000005 sec
+f90nml: Read in chunks (3 threads) :                   8.443905700000016 sec
+f90nml: Read in chunks (4 threads) :                   6.226133799999985 sec
+fastnml: Read in chunks (0 threads) :                  1.0096473000000117 sec
+fastnml: Read in chunks (1 threads) :                  1.3259695000000136 sec
+fastnml: Read in chunks (2 threads) :                  1.036898100000002 sec
+fastnml: Read in chunks (3 threads) :                  1.159534999999977 sec
+fastnml: Read in chunks (4 threads) :                  1.0741505999999958 sec
+
+-----------------------------
+test4b.nml
+-----------------------------
+
+f90nml: Read all at once from file (0 threads) :       7.980078500000019 sec
+f90nml: Read in chunks (0 threads) :                   8.990785700000004 sec
+f90nml: Read in chunks (1 threads) :                   9.161885600000005 sec
+f90nml: Read in chunks (2 threads) :                   4.726017299999995 sec
+f90nml: Read in chunks (3 threads) :                   3.553860500000013 sec
+f90nml: Read in chunks (4 threads) :                   2.7503221000000053 sec
+fastnml: Read in chunks (0 threads) :                  0.37847529999999097 sec
+fastnml: Read in chunks (1 threads) :                  0.677776300000005 sec
+fastnml: Read in chunks (2 threads) :                  0.5017527999999913 sec
+fastnml: Read in chunks (3 threads) :                  0.5212353000000007 sec
+fastnml: Read in chunks (4 threads) :                  0.41918479999998226 sec
+
+-----------------------------
+test4c.nml
+-----------------------------
+
+f90nml: Read all at once from file (0 threads) :       11.072592100000008 sec
+f90nml: Read in chunks (0 threads) :                   40.973017 sec
+f90nml: Read in chunks (1 threads) :                   28.69594159999997 sec
+f90nml: Read in chunks (2 threads) :                   14.902919899999972 sec
+f90nml: Read in chunks (3 threads) :                   10.096066500000006 sec
+f90nml: Read in chunks (4 threads) :                   8.136358200000018 sec
+fastnml: Read in chunks (0 threads) :                  1.1177955999999654 sec
+fastnml: Read in chunks (1 threads) :                  1.526128500000027 sec
+fastnml: Read in chunks (2 threads) :                  1.060428600000023 sec
+fastnml: Read in chunks (3 threads) :                  0.9990597000000321 sec
+fastnml: Read in chunks (4 threads) :                  1.0846950000000106 sec
 ```
------------------------------
-files/test.nml
------------------------------
 
-f90nml: Read all at once from file :                   6.535212993621826 sec
-f90nml: Read in chunks (no threads) :                  4.172897815704346 sec
-f90nml: Read in chunks (threads) (1 threads) :         4.220002889633179 sec
-f90nml: Read in chunks (threads) (2 threads) :         2.226668119430542 sec
-f90nml: Read in chunks (threads) (3 threads) :         1.606447696685791 sec
-Fast-namelist: Read in chunks (no threads) :           0.3533191680908203 sec
-Fast-namelist: Read in chunks (threads) (1 threads) :  0.45674991607666016 sec
-Fast-namelist: Read in chunks (threads) (2 threads) :  0.2564396858215332 sec
-Fast-namelist: Read in chunks (threads) (3 threads) :  0.2612619400024414 sec
+### Dependencies
 
------------------------------
-files/test4.nml
------------------------------
-
-f90nml: Read all at once from file :                   31.266510248184204 sec
-f90nml: Read in chunks (no threads) :                  21.861836671829224 sec
-f90nml: Read in chunks (threads) (1 threads) :         19.341630935668945 sec
-f90nml: Read in chunks (threads) (2 threads) :         10.51621389389038 sec
-f90nml: Read in chunks (threads) (3 threads) :         7.911913871765137 sec
-Fast-namelist: Read in chunks (no threads) :           1.2729849815368652 sec
-Fast-namelist: Read in chunks (threads) (1 threads) :  1.5219929218292236 sec
-Fast-namelist: Read in chunks (threads) (2 threads) :  1.1071321964263916 sec
-Fast-namelist: Read in chunks (threads) (3 threads) :  1.088028907775879 sec
-
------------------------------
-files/test4b.nml
------------------------------
-
-f90nml: Read all at once from file :                   6.987016916275024 sec
-f90nml: Read in chunks (no threads) :                  7.977221965789795 sec
-f90nml: Read in chunks (threads) (1 threads) :         8.136826753616333 sec
-f90nml: Read in chunks (threads) (2 threads) :         4.201086044311523 sec
-f90nml: Read in chunks (threads) (3 threads) :         2.9662628173828125 sec
-Fast-namelist: Read in chunks (no threads) :           0.3699190616607666 sec
-Fast-namelist: Read in chunks (threads) (1 threads) :  0.46530675888061523 sec
-Fast-namelist: Read in chunks (threads) (2 threads) :  0.2625417709350586 sec
-Fast-namelist: Read in chunks (threads) (3 threads) :  0.26222896575927734 sec
-
------------------------------
-files/test4c.nml
------------------------------
-
-f90nml: Read all at once from file :                   9.853593826293945 sec
-f90nml: Read in chunks (no threads) :                  32.57745814323425 sec
-f90nml: Read in chunks (threads) (1 threads) :         30.11258316040039 sec
-f90nml: Read in chunks (threads) (2 threads) :         14.676537036895752 sec
-f90nml: Read in chunks (threads) (3 threads) :         10.478646993637085 sec
-Fast-namelist: Read in chunks (no threads) :           1.18827486038208 sec
-Fast-namelist: Read in chunks (threads) (1 threads) :  1.6335108280181885 sec
-Fast-namelist: Read in chunks (threads) (2 threads) :  1.54339599609375 sec
-Fast-namelist: Read in chunks (threads) (3 threads) :  1.2029950618743896 sec
-```
+ * [f90nml](https://github.com/marshallward/f90nml) -- the more general library
