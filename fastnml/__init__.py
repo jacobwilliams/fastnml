@@ -1,5 +1,5 @@
 __appname__ = "fastnml"
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 __credits__ = ["Jacob Williams", "Randy Eckman"]
 __license__ = "BSD"
 
