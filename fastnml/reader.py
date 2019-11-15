@@ -124,34 +124,50 @@ def _nml_value_to_python_value(value: str) -> _nml_types:
 ###############################################################################
 def _read_single_namelist(lines: List[str], parser: Parser,
                           simple: bool) -> Namelist:
+    """
+    Read a namelist.
+
+    * Simple parser. Assumes one array element per line.
+        For example: `val%a(2)%b = value,`
+    * Otherwise (or if the simple parser fails) it defaults
+        to using f90nml to read it.
+
+    Note that comment lines and blank lines have already been removed.
+    """
 
     nml = None
     if simple:
-        """
-        Simple parser. Assumes one array element per line.
-        For example: `val%a(2)%b = value,`
-
-        Note that comment lines and blank lines have already been removed.
-        """
         try:
+
             namelist_name = lines[0].lstrip('&').strip().lower()
             nml = Namelist({namelist_name: Namelist({})})
             for line in lines[1:]:
                 d = line.split('=', 1)
-                if (len(d) >= 2):
-                    # convert the string to a Python value:
-                    value = _nml_value_to_python_value(d[1].rstrip(', '))
+                if (len(d) == 1):
+                    if d[0].strip()=='/':
+                        break # end of the namelist
+                    else:
+                        raise Exception('invalid line') # something else - not valid
+                elif (len(d) >= 2):
+                    if d[0][0]=="'" or d[0][0]=='"':
+                        raise Exception('invalid line') # = in a string - not valid
+                    else:
+                        # convert the string to a Python value:
+                        value = _nml_value_to_python_value(d[1].rstrip(', '))
 
-                    # add this value to the namelist:
-                    path = d[0].strip()
-                    _pathSet(nml[namelist_name], path, value)
+                        # add this value to the namelist:
+                        path = d[0].strip()
+                        _pathSet(nml[namelist_name], path, value)
+
         except Exception:
             nml = None
+
     if nml is None:
         try:
             nml = parser.reads(''.join(lines))  # f90nml 1.1
         except AttributeError:
             nml = parser._readstream(iter(lines), {})  # previous ver
+
     return nml
 
 ###############################################################################
