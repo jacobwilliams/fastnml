@@ -163,10 +163,7 @@ def _read_single_namelist(lines: List[str], parser: Parser,
             nml = None
 
     if nml is None:
-        try:
-            nml = parser.reads(''.join(lines))  # f90nml 1.1
-        except AttributeError:
-            nml = parser._readstream(iter(lines), {})  # previous ver
+        nml = parser.reads('\n'.join(lines))  # f90nml 1.1 and above
 
     return nml
 
