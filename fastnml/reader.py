@@ -152,12 +152,19 @@ def _read_single_namelist(lines: List[str], parser: Parser,
                     if d[0][0]=="'" or d[0][0]=='"':
                         raise Exception('invalid line') # = in a string - not valid
                     else:
-                        # convert the string to a Python value:
-                        value = _nml_value_to_python_value(d[1].rstrip(', '))
-
-                        # add this value to the namelist:
                         path = d[0].strip()
-                        _pathSet(nml[namelist_name], path, value)
+
+                        if ':' in path:
+                            raise Exception('invalid line') # can't read multiple entries at once - not valid
+                        else:
+                            # warning: it will still read lines like
+                            # this: `a = 1,2,3` as a single string
+
+                            # convert the string to a Python value:
+                            value = _nml_value_to_python_value(d[1].rstrip(', '))
+
+                            # add this value to the namelist:
+                            _pathSet(nml[namelist_name], path, value)
 
         except Exception:
             nml = None
