@@ -116,10 +116,7 @@ def _nml_value_to_python_value(value: str) -> _nml_types:
         try:
             return int(value_str)
         except ValueError:
-            try:
-                return float(value_str)
-            except ValueError:
-                return value_str
+            return float(value_str)
 
 ###############################################################################
 def _read_single_namelist(lines: List[str], parser: Parser,
