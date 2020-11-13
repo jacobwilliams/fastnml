@@ -1,3 +1,7 @@
+"""
+Read namelists
+"""
+
 from f90nml import Namelist, Parser
 import multiprocessing as mp
 import re
@@ -94,6 +98,9 @@ def _pathGet(dictionary: dict, path: str,
 
 ###############################################################################
 def _nml_value_to_python_value(value: str) -> _nml_types:
+    """
+    Convert the namelist value to a Python value.
+    """
 
     value_str = value.strip()
     value_str_bool = value_str.lower().strip('.')

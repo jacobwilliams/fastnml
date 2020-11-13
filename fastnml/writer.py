@@ -1,3 +1,7 @@
+"""
+Write namelists
+"""
+
 from typing import Union, Any
 from io import TextIOWrapper
 
@@ -69,7 +73,7 @@ def write_namelist_to_stream(d: dict, file: TextIOWrapper):
 def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     """
     Print a dict as a namelist file.
-    Assumes an f90nml namelist style structure
+    Assumes an `f90nml` namelist style structure
     (a dict of dicts, some of which can be lists).
 
     This uses the "simple" format, with one variable per line.
