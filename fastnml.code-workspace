@@ -4,9 +4,12 @@
 			"path": "."
 		}
 	],
-	"settings": {
-
-	},
+  "settings": {
+      "files.trimTrailingWhitespace": true,
+      "editor.insertSpaces": true,
+      "editor.tabSize": 4,
+      "editor.trimAutoWhitespace": true
+  },
 	"launch": {
 		// Use IntelliSense to learn about possible attributes.
 		// Hover to view descriptions of existing attributes.
