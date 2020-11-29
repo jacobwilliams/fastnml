@@ -1,6 +1,8 @@
 """
 FastNml -- Read and write Fortran namelists fast.
 
+## About
+
 The `fastnml` code only works with a specific subset of the namelist format. It is not nearly as general or robust as [f90nml](https://github.com/marshallward/f90nml), but it is much faster when reading very large namelists. Also, both codes are tested using multiprocessing to read many namelists in parallel.
 
 This library assumes the namelist is written one value per line.
@@ -16,7 +18,7 @@ This includes all types and array elements.  For example:
 ```
 If the simple parser fails, it defaults to using `f90nml` to read it.
 
-## See also:
+## See also
 
  * [f90nml](https://github.com/marshallward/f90nml) -- the more general library
 """
