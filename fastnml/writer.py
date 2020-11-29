@@ -60,7 +60,8 @@ def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
     f.write('\n')
 
 ###############################################################################
-def write_namelist_to_stream(d: dict, file: TextIOWrapper):
+def _write_namelist_to_stream(d: dict, file: TextIOWrapper):
+    """Called by `save_namelist`"""
 
     for k, v in d.items():
         if isinstance(v, list):
@@ -81,6 +82,6 @@ def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
 
     if isinstance(file, str):
         with open(file, 'w') as file:
-            write_namelist_to_stream(d, file)
+            _write_namelist_to_stream(d, file)
     else:
-        write_namelist_to_stream(d, file)
+        _write_namelist_to_stream(d, file)
