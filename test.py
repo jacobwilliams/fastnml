@@ -42,12 +42,10 @@ def run_read_tests(filenames, tests, parser, repeats):
         for t in tests:
             func, threads = t
             for n_threads in range(0, threads + 1):
-                # case = f"{func.__doc__} ({n_threads} threads) : "
-                case = "{} ({} threads) : ".format(func.__doc__, n_threads)
+                case = f'{func.__doc__} ({n_threads} threads) : '
                 tottime = timeit(lambda: func(filename, n_threads, parser),
                                  number=repeats)
-                # print(f"{case.ljust(55)}{tottime/repeats} sec")
-                print("{}{} sec".format(case.ljust(55), tottime/repeats))
+                print(f'{case.ljust(55)}{tottime/repeats} sec')
 
 
 class TestFastnml(unittest.TestCase):
