@@ -25,6 +25,7 @@ If the simple parser fails, it defaults to using `f90nml` to read it.
 
 ## See also
 
+ * [fastnml](https://github.com/jacobwilliams/fastnml) -- The main git repository
  * [f90nml](https://github.com/marshallward/f90nml) -- the more general library
 """
 
