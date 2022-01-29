@@ -32,13 +32,14 @@ setup(
     author_email='jacob@degenerateconic.com',
     classifiers=[
         'License :: OSI Approved :: BSD License',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
         'Operating System :: OS Independent',
     ],
     keywords='namelist fortran',
     packages=find_packages(exclude=['docs', 'tests']),
-    python_requires='>=3.5',
+    python_requires='>=3.6',
     install_requires=['f90nml>=1.1.0'],
 )
