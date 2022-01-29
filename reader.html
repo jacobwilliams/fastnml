@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>fastnml.reader API documentation</title>
+<meta name="description" content="Read namelists" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>fastnml.reader</code></h1>
+</header>
+<section id="section-intro">
+<p>Read namelists</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;
+Read namelists
+&#34;&#34;&#34;
+
+from f90nml import Namelist, Parser
+import multiprocessing as mp
+import re
+from typing import List, Union
+
+_nml_types = Union[int, float, bool, str]
+_array_rg = re.compile(&#39;((?:[a-z][a-z0-9_]*))(\\()(\\d+)(\\))(.*)&#39;,
+                       re.IGNORECASE | re.DOTALL)
+
+###############################################################################
+def _get_array_index(s: str) -&gt; (int, str):
+    &#34;&#34;&#34;
+    If the variable name represents an array element (e.g., &#39;VAR(1)&#39;),
+    then return the array index (1-based) and the variable name.
+    Otherwise, return None.
+    &#34;&#34;&#34;
+
+    # initial quick check:
+    if &#39;(&#39; not in s:
+        return None, None
+
+    m = _array_rg.search(s.strip())
+    if m:
+        if (m.group(5) == &#39;&#39;):
+            return int(m.group(3)), m.group(1)  # index, arrayname
+        else:
+            # invalid array string
+            return None, None
+    else:
+        return None, None
+
+###############################################################################
+def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = &#39;%&#39;):
+    &#39;&#39;&#39;
+    Sets a variable in a dictionary, given the namelist path string.
+    Assumes the input path uses Fortran-style 1-based indexing of arrays
+    &#39;&#39;&#39;
+
+    path = path.split(sep)
+    key = path[-1]
+    dictionary = _pathGet(dictionary, sep.join(path[:-1]), sep=sep)
+    i, arrayname = _get_array_index(key)
+    if (i is not None):
+        # it is an array element:
+        if (arrayname not in dictionary):
+            dictionary[arrayname] = [None]
+        x = dictionary[arrayname]
+        lenx = len(x)
+        if lenx &lt; i:
+            # have to add this element
+            for j in range(lenx, i):
+                x.append(None)
+        x[i - 1] = value
+    else:
+        # it is just a normal variable:
+        dictionary[key] = value
+
+###############################################################################
+def _pathGet(dictionary: dict, path: str,
+             sep: str = &#39;%&#39;) -&gt; Union[_nml_types, dict, list]:
+    &#39;&#39;&#39;
+    Returns an item in a dictionary given the namelist path string.
+    Assumes the input path uses Fortran-style 1-based indexing of arrays
+    &#39;&#39;&#39;
+
+    for item in path.split(sep):
+        i, arrayname = _get_array_index(item)
+        if (i is not None):
+            # it is an array element:
+            # create this item since it isn&#39;t there
+            if (arrayname not in dictionary):
+                dictionary[arrayname] = [None]
+            d = dictionary[arrayname]
+            lenx = len(d)
+            if lenx &lt; i:
+                # have to add this element
+                for j in range(lenx, i):
+                    d.append(None)
+
+            # make sure it&#39;s a dict:
+            if (not isinstance(d[i - 1], dict)):
+                d[i - 1] = Namelist({})
+            dictionary = d[i - 1]
+        else:
+            # it is just a normal variable:
+            # make sure it&#39;s a dict first
+            if (not isinstance(dictionary, dict)):
+                dictionary = Namelist({})
+            if (item not in dictionary):
+                dictionary[item] = Namelist({})
+            dictionary = dictionary[item]
+
+    return dictionary
+
+###############################################################################
+def _nml_value_to_python_value(value: str) -&gt; _nml_types:
+    &#34;&#34;&#34;
+    Convert the namelist value to a Python value.
+    &#34;&#34;&#34;
+
+    value_str = value.strip()
+    value_str_bool = value_str.lower().strip(&#39;.&#39;)
+    if (value_str_bool == &#39;t&#39; or value_str_bool == &#39;true&#39;):
+        # logical
+        return True
+    elif (value_str_bool == &#39;f&#39; or value_str_bool == &#39;false&#39;):
+        # logical
+        return False
+    elif (value_str[0] == &#39;&#34;&#39; and value_str[-1] == &#39;&#34;&#39;):
+        # string
+        # fortran to python convention
+        return value_str[1:-1].replace(&#39;&#34;&#34;&#39;, &#39;&#34;&#39;)
+    elif (value_str[0] == &#34;&#39;&#34; and value_str[-1] == &#34;&#39;&#34;):
+        # string
+        # fortran to python convention
+        return value_str[1:-1].replace(&#34;&#39;&#39;&#34;, &#34;&#39;&#34;)
+    else:
+        # int or double:
+        try:
+            return int(value_str)
+        except ValueError:
+            return float(value_str)
+
+###############################################################################
+def _read_single_namelist(lines: List[str], parser: Parser,
+                          simple: bool) -&gt; Namelist:
+    &#34;&#34;&#34;
+    Read a namelist.
+
+    * Simple parser. Assumes one array element per line.
+        For example: `val%a(2)%b = value,`
+    * Otherwise (or if the simple parser fails) it defaults
+        to using f90nml to read it.
+
+    Note that comment lines and blank lines have already been removed.
+    &#34;&#34;&#34;
+
+    nml = None
+    if simple:
+        try:
+
+            namelist_name = lines[0].lstrip(&#39;&amp;&#39;).strip().lower()
+            nml = Namelist({namelist_name: Namelist({})})
+            for line in lines[1:]:
+                d = line.split(&#39;=&#39;, 1)
+                if (len(d) == 1):
+                    if d[0].strip()==&#39;/&#39;:
+                        break # end of the namelist
+                    else:
+                        raise Exception(&#39;invalid line&#39;) # something else - not valid
+                elif (len(d) &gt;= 2):
+                    if d[0][0]==&#34;&#39;&#34; or d[0][0]==&#39;&#34;&#39;:
+                        raise Exception(&#39;invalid line&#39;) # = in a string - not valid
+                    else:
+                        path = d[0].strip()
+
+                        if &#39;:&#39; in path:
+                            raise Exception(&#39;invalid line&#39;) # can&#39;t read multiple entries at once - not valid
+                        else:
+                            # warning: it will still read lines like
+                            # this: `a = 1,2,3` as a single string
+
+                            # convert the string to a Python value:
+                            value = _nml_value_to_python_value(d[1].rstrip(&#39;, &#39;))
+
+                            # add this value to the namelist:
+                            _pathSet(nml[namelist_name], path, value)
+
+        except Exception:
+            nml = None
+
+    if nml is None:
+        nml = parser.reads(&#39;\n&#39;.join(lines))  # f90nml 1.1 and above
+
+    return nml
+
+###############################################################################
+# def split_namelist_str(s: str):
+#     &#34;&#34;&#34;alternate version of split_namelist_file with a string as an input&#34;&#34;&#34;
+#     namelists = []
+#     i = -1
+#     started = False
+#     f = s.split(&#39;\n&#39;)
+#     for line in f:
+#         line = line.strip()
+#         if (len(line) &gt; 0):
+#             if (line[0] != &#39;!&#39;):
+#                 if (line[0] == &#39;&amp;&#39;):  # start a namelist
+#                     i = i + 1
+#                     namelists.append([])
+#                     started = True
+#                 elif (line[0:1] == &#39;/&#39;):  # end a namelist
+#                     started = False
+#                     namelists[i].append(line)
+#                     continue
+#                 if started:
+#                     namelists[i].append(line)
+#     return namelists
+
+###############################################################################
+def _split_namelist_file(filename: str) -&gt; List[str]:
+    &#34;&#34;&#34; split a namelist file into an array of namelist strings &#34;&#34;&#34;
+
+    namelists = list()
+    i = -1
+    started = False
+    with open(filename, &#39;r&#39;) as f:
+        for line in f:
+            line = line.strip()
+            if (len(line) &gt; 0):
+                if (line[0] != &#39;!&#39;):
+                    if (line[0] == &#39;&amp;&#39;):  # start a namelist
+                        i = i + 1
+                        namelists.append(list())
+                        started = True
+                    elif (line[0:1] == &#39;/&#39;):  # end a namelist
+                        started = False
+                        namelists[i].append(line)
+                        continue
+                    if started:
+                        namelists[i].append(line)
+
+    return namelists
+
+###############################################################################
+def read_namelist(filename: str, *, n_threads: int = 0,
+                  parser: Parser = None,
+                  simple: bool = True) -&gt; Namelist:
+    &#34;&#34;&#34;
+    Read a namelist quickly.
+
+    For threaded use, set `n_threads` to the number of threads.
+    &#34;&#34;&#34;
+
+    nml = Namelist({})
+
+    def _loop_over_results(r):
+        for key, value in r.items():
+            if key in nml:
+                # array of namelists:
+                if isinstance(nml[key], list):
+                    nml[key].append(value)
+                else:
+                    nml[key] = [nml[key], value]
+            else:
+                nml[key] = value
+
+    if not parser:
+        parser = Parser()
+
+    namelists = _split_namelist_file(filename)
+    results = list()
+    results_append = results.append
+
+    if n_threads:
+        n_threads = max(1, min(mp.cpu_count(), n_threads))
+        pool = mp.Pool(processes=n_threads)
+        pool_apply_async = pool.apply_async
+
+        for lines in namelists:
+            results_append(pool_apply_async(_read_single_namelist,
+                                            (lines, parser, simple)))
+
+        pool.close()
+        pool.join()
+
+        for r in results:
+            _loop_over_results(r.get())
+    else:
+        for lines in namelists:
+            results_append(_read_single_namelist(lines, parser, simple))
+        for r in results:
+            _loop_over_results(r)
+
+    return nml</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="fastnml.reader.read_namelist"><code class="name flex">
+<span>def <span class="ident">read_namelist</span></span>(<span>filename: str, *, n_threads: int = 0, parser: f90nml.parser.Parser = None, simple: bool = True) ‑> f90nml.namelist.Namelist</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Read a namelist quickly.</p>
+<p>For threaded use, set <code>n_threads</code> to the number of threads.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_namelist(filename: str, *, n_threads: int = 0,
+                  parser: Parser = None,
+                  simple: bool = True) -&gt; Namelist:
+    &#34;&#34;&#34;
+    Read a namelist quickly.
+
+    For threaded use, set `n_threads` to the number of threads.
+    &#34;&#34;&#34;
+
+    nml = Namelist({})
+
+    def _loop_over_results(r):
+        for key, value in r.items():
+            if key in nml:
+                # array of namelists:
+                if isinstance(nml[key], list):
+                    nml[key].append(value)
+                else:
+                    nml[key] = [nml[key], value]
+            else:
+                nml[key] = value
+
+    if not parser:
+        parser = Parser()
+
+    namelists = _split_namelist_file(filename)
+    results = list()
+    results_append = results.append
+
+    if n_threads:
+        n_threads = max(1, min(mp.cpu_count(), n_threads))
+        pool = mp.Pool(processes=n_threads)
+        pool_apply_async = pool.apply_async
+
+        for lines in namelists:
+            results_append(pool_apply_async(_read_single_namelist,
+                                            (lines, parser, simple)))
+
+        pool.close()
+        pool.join()
+
+        for r in results:
+            _loop_over_results(r.get())
+    else:
+        for lines in namelists:
+            results_append(_read_single_namelist(lines, parser, simple))
+        for r in results:
+            _loop_over_results(r)
+
+    return nml</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="fastnml" href="index.html">fastnml</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="fastnml.reader.read_namelist" href="#fastnml.reader.read_namelist">read_namelist</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
