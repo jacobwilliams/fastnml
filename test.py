@@ -27,10 +27,8 @@ def read_chunks_simple(filename, n_threads, parser):
 
 def run_read_tests(filenames, tests, parser, repeats):
 
-    # print(f"Each test will be repeated {repeats} times.  "
-    #       f"Reported times are averages.")
-    print(("Each test will be repeated {} times.  "
-           "Reported times are averages.").format(repeats))
+    # print(f'Each test will be repeated {repeats} times.  '
+    #       f'Reported times are averages.')
 
     for filename in filenames:
         print('')
@@ -113,7 +111,7 @@ class TestFastnml(unittest.TestCase):
         parser = f90nml.Parser()
         parser.global_start_index = 1
 
-        repeats = 10
+        repeats = 1
 
         run_read_tests(filenames, tests, parser, repeats)
 
