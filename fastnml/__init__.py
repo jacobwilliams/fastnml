@@ -29,10 +29,10 @@ If the simple parser fails, it defaults to using `f90nml` to read it.
  * [f90nml](https://github.com/marshallward/f90nml) -- the more general library
 """
 
-__appname__ = 'fastnml'
-__version__ = '2.0.0'
-__credits__ = ['Jacob Williams', 'Randy Eckman']
-__license__ = 'BSD'
+__appname__ = "fastnml"
+__version__ = "2.0.0"
+__credits__ = ["Jacob Williams", "Randy Eckman"]
+__license__ = "BSD"
 
 import f90nml
 
