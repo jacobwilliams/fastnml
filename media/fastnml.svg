@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="95.030731mm"
+   height="33.562714mm"
+   viewBox="0 0 95.030731 33.562714"
+   version="1.1"
+   id="svg868"
+   inkscape:version="1.0.2 (e86c8708, 2021-01-15)"
+   sodipodi:docname="fastnml.svg"
+   inkscape:export-filename="fastnml.png"
+   inkscape:export-xdpi="213.83"
+   inkscape:export-ydpi="213.83">
+  <defs
+     id="defs862">
+    <rect
+       x="0"
+       y="99.029762"
+       width="172.03577"
+       height="135.44368"
+       id="rect2206" />
+    <rect
+       x="0"
+       y="99.029762"
+       width="127"
+       height="37.041668"
+       id="rect2208" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.3074251"
+     inkscape:cx="237.93995"
+     inkscape:cy="5.1465593"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     inkscape:document-rotation="0"
+     showgrid="false"
+     inkscape:window-width="1252"
+     inkscape:window-height="787"
+     inkscape:window-x="0"
+     inkscape:window-y="25"
+     inkscape:window-maximized="0"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata865">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(19.010761,-117.44944)">
+    <rect
+       style="opacity:1;fill:#000000;stroke:none;stroke-width:5.29167;stroke-linecap:round;stroke-linejoin:round;paint-order:stroke fill markers"
+       id="rect2190"
+       width="89.648155"
+       height="25.752586"
+       x="-13.628186"
+       y="125.25957"
+       ry="4.3730807" />
+    <g
+       id="g2198"
+       transform="rotate(-15.333992,105.98742,378.60543)">
+      <rect
+         style="fill:#6c4f96;fill-opacity:1;stroke:#734f96;stroke-width:1.32292;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+         id="rect2192"
+         width="20.628054"
+         height="19.614315"
+         x="53.171673"
+         y="99.151596"
+         ry="2.1793675" />
+      <text
+         xml:space="preserve"
+         id="text2196"
+         style="font-size:10.58329999999999949px;line-height:1.25;font-family:'Clarendon BT';-inkscape-font-specification:'Clarendon BT';white-space:pre;shape-inside:url(#rect2206);fill:#ffffff;stroke-width:5.80419;"
+         transform="matrix(0.17228895,0,0,0.17228895,55.688232,83.991456)"><tspan
+           x="0"
+           y="108.39304"><tspan
+             style="fill:#ffffff;stroke-width:5.80419">&amp;nml
+</tspan></tspan><tspan
+           x="0"
+           y="121.62216"><tspan
+             style="fill:#ffffff;stroke-width:5.80419"> a = 1,
+</tspan></tspan><tspan
+           x="0"
+           y="134.85129"><tspan
+             style="fill:#ffffff;stroke-width:5.80419"> c%a(1)%b = 1.0,
+</tspan></tspan><tspan
+           x="0"
+           y="148.08041"><tspan
+             style="fill:#ffffff;stroke-width:5.80419"> c%a(2)%b = 1.0,
+</tspan></tspan><tspan
+           x="0"
+           y="161.30954"><tspan
+             style="fill:#ffffff;stroke-width:5.80419"> d(1) = 2,
+</tspan></tspan><tspan
+           x="0"
+           y="174.53867"><tspan
+             style="fill:#ffffff;stroke-width:5.80419"> d(2) = 3
+</tspan></tspan><tspan
+           x="0"
+           y="187.76779"><tspan
+             style="fill:#ffffff;stroke-width:5.80419">/
+</tspan></tspan></text>
+    </g>
+    <text
+       xml:space="preserve"
+       id="text2204"
+       style="font-size:10.58329999999999949px;line-height:1.25;font-family:'Clarendon BT';-inkscape-font-specification:'Clarendon BT';white-space:pre;shape-inside:url(#rect2208);fill:#ffffff;stroke-width:0.537626;"
+       transform="matrix(1.8600284,0,0,1.8600284,-8.3091518,-57.052689)"><tspan
+         x="0"
+         y="108.39304"><tspan
+           style="fill:#ffffff">Fastnml</tspan></tspan></text>
+  </g>
+</svg>
