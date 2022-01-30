@@ -37,12 +37,13 @@ from io import TextIOWrapper
 ###############################################################################
 def _traverse_value(f: TextIOWrapper, path: str, sep: str, path2: str, d: Any):
 
-    if path.strip() != &#39;&#39;:
-        path2 = f&#39;{path}{sep}{path2}&#39;
+    if path.strip() != &#34;&#34;:
+        path2 = f&#34;{path}{sep}{path2}&#34;
     _traverse_dict(f, d, path2)
 
+
 ###############################################################################
-def _traverse_dict(f: TextIOWrapper, d: Any, path: str = &#39;&#39;, sep: str = &#39;%&#39;):
+def _traverse_dict(f: TextIOWrapper, d: Any, path: str = &#34;&#34;, sep: str = &#34;%&#34;):
     &#34;&#34;&#34;
     traverse a dict and print the paths to each variable in namelist style
     &#34;&#34;&#34;
@@ -53,8 +54,7 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = &#39;&#39;, sep: str = 
                 index = 0
                 for element in v:
                     index += 1
-                    _traverse_value(f, path, sep, f&#39;{k}({index})&#39;,
-                                    element)
+                    _traverse_value(f, path, sep, f&#34;{k}({index})&#34;, element)
             else:
                 _traverse_value(f, path, sep, k, v)
     elif isinstance(d, list):
@@ -62,7 +62,7 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = &#39;&#39;, sep: str = 
             _traverse_dict(f, element, path)
     else:
         path = path.lower()
-        if (d is None):
+        if d is None:
             pass
         elif isinstance(d, str):
             s = d.replace(&#34;&#39;&#34;, &#34;&#39;&#39;&#34;)
@@ -74,13 +74,15 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = &#39;&#39;, sep: str = 
         elif isinstance(d, float):
             f.write(f&#34; {path} = {d:.17E},\n&#34;)
 
+
 ###############################################################################
 def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
 
-    f.write(f&#39;&amp;{namelist_name.lower()}\n&#39;)
+    f.write(f&#34;&amp;{namelist_name.lower()}\n&#34;)
     _traverse_dict(f, d)
-    f.write(&#39;/\n&#39;)
-    f.write(&#39;\n&#39;)
+    f.write(&#34;/\n&#34;)
+    f.write(&#34;\n&#34;)
+
 
 ###############################################################################
 def _write_namelist_to_stream(d: dict, file: TextIOWrapper):
@@ -93,6 +95,7 @@ def _write_namelist_to_stream(d: dict, file: TextIOWrapper):
         elif isinstance(v, dict):
             _print_single_namelist(file, k, v)
 
+
 ###############################################################################
 def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     &#34;&#34;&#34;
@@ -104,7 +107,7 @@ def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     &#34;&#34;&#34;
 
     if isinstance(file, str):
-        with open(file, &#39;w&#39;) as file:
+        with open(file, &#34;w&#34;) as file:
             _write_namelist_to_stream(d, file)
     else:
         _write_namelist_to_stream(d, file)</code></pre>
@@ -139,7 +142,7 @@ Assumes an <code>f90nml</code> namelist style structure
     &#34;&#34;&#34;
 
     if isinstance(file, str):
-        with open(file, &#39;w&#39;) as file:
+        with open(file, &#34;w&#34;) as file:
             _write_namelist_to_stream(d, file)
     else:
         _write_namelist_to_stream(d, file)</code></pre>

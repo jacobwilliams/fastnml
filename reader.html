@@ -34,14 +34,17 @@ Read namelists
 from f90nml import Namelist, Parser
 import multiprocessing as mp
 import re
-from typing import List, Union
+from typing import List, Union, Tuple
 
 _nml_types = Union[int, float, bool, str]
-_array_rg = re.compile(&#39;((?:[a-z][a-z0-9_]*))(\\()(\\d+)(\\))(.*)&#39;,
-                       re.IGNORECASE | re.DOTALL)
+_array_rg = re.compile(
+    &#34;((?:[a-z][a-z0-9_]*))(\\()(\\d+)(\\))(.*)&#34;, re.IGNORECASE | re.DOTALL
+)
 
 ###############################################################################
-def _get_array_index(s: str) -&gt; (int, str):
+
+
+def _get_array_index(s: str) -&gt; Tuple[int, str]:
     &#34;&#34;&#34;
     If the variable name represents an array element (e.g., &#39;VAR(1)&#39;),
     then return the array index (1-based) and the variable name.
@@ -49,12 +52,12 @@ def _get_array_index(s: str) -&gt; (int, str):
     &#34;&#34;&#34;
 
     # initial quick check:
-    if &#39;(&#39; not in s:
+    if &#34;(&#34; not in s:
         return None, None
 
     m = _array_rg.search(s.strip())
     if m:
-        if (m.group(5) == &#39;&#39;):
+        if m.group(5) == &#34;&#34;:
             return int(m.group(3)), m.group(1)  # index, arrayname
         else:
             # invalid array string
@@ -62,20 +65,21 @@ def _get_array_index(s: str) -&gt; (int, str):
     else:
         return None, None
 
+
 ###############################################################################
-def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = &#39;%&#39;):
-    &#39;&#39;&#39;
+def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = &#34;%&#34;):
+    &#34;&#34;&#34;
     Sets a variable in a dictionary, given the namelist path string.
     Assumes the input path uses Fortran-style 1-based indexing of arrays
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
 
     path = path.split(sep)
     key = path[-1]
     dictionary = _pathGet(dictionary, sep.join(path[:-1]), sep=sep)
     i, arrayname = _get_array_index(key)
-    if (i is not None):
+    if i is not None:
         # it is an array element:
-        if (arrayname not in dictionary):
+        if arrayname not in dictionary:
             dictionary[arrayname] = [None]
         x = dictionary[arrayname]
         lenx = len(x)
@@ -88,20 +92,22 @@ def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = &#39;%&#
         # it is just a normal variable:
         dictionary[key] = value
 
+
 ###############################################################################
-def _pathGet(dictionary: dict, path: str,
-             sep: str = &#39;%&#39;) -&gt; Union[_nml_types, dict, list]:
-    &#39;&#39;&#39;
+def _pathGet(
+    dictionary: dict, path: str, sep: str = &#34;%&#34;
+) -&gt; Union[_nml_types, dict, list]:
+    &#34;&#34;&#34;
     Returns an item in a dictionary given the namelist path string.
     Assumes the input path uses Fortran-style 1-based indexing of arrays
-    &#39;&#39;&#39;
+    &#34;&#34;&#34;
 
     for item in path.split(sep):
         i, arrayname = _get_array_index(item)
-        if (i is not None):
+        if i is not None:
             # it is an array element:
             # create this item since it isn&#39;t there
-            if (arrayname not in dictionary):
+            if arrayname not in dictionary:
                 dictionary[arrayname] = [None]
             d = dictionary[arrayname]
             lenx = len(d)
@@ -111,19 +117,20 @@ def _pathGet(dictionary: dict, path: str,
                     d.append(None)
 
             # make sure it&#39;s a dict:
-            if (not isinstance(d[i - 1], dict)):
+            if not isinstance(d[i - 1], dict):
                 d[i - 1] = Namelist({})
             dictionary = d[i - 1]
         else:
             # it is just a normal variable:
             # make sure it&#39;s a dict first
-            if (not isinstance(dictionary, dict)):
+            if not isinstance(dictionary, dict):
                 dictionary = Namelist({})
-            if (item not in dictionary):
+            if item not in dictionary:
                 dictionary[item] = Namelist({})
             dictionary = dictionary[item]
 
     return dictionary
+
 
 ###############################################################################
 def _nml_value_to_python_value(value: str) -&gt; _nml_types:
@@ -132,18 +139,18 @@ def _nml_value_to_python_value(value: str) -&gt; _nml_types:
     &#34;&#34;&#34;
 
     value_str = value.strip()
-    value_str_bool = value_str.lower().strip(&#39;.&#39;)
-    if (value_str_bool == &#39;t&#39; or value_str_bool == &#39;true&#39;):
+    value_str_bool = value_str.lower().strip(&#34;.&#34;)
+    if value_str_bool == &#34;t&#34; or value_str_bool == &#34;true&#34;:
         # logical
         return True
-    elif (value_str_bool == &#39;f&#39; or value_str_bool == &#39;false&#39;):
+    elif value_str_bool == &#34;f&#34; or value_str_bool == &#34;false&#34;:
         # logical
         return False
-    elif (value_str[0] == &#39;&#34;&#39; and value_str[-1] == &#39;&#34;&#39;):
+    elif value_str[0] == &#39;&#34;&#39; and value_str[-1] == &#39;&#34;&#39;:
         # string
         # fortran to python convention
         return value_str[1:-1].replace(&#39;&#34;&#34;&#39;, &#39;&#34;&#39;)
-    elif (value_str[0] == &#34;&#39;&#34; and value_str[-1] == &#34;&#39;&#34;):
+    elif value_str[0] == &#34;&#39;&#34; and value_str[-1] == &#34;&#39;&#34;:
         # string
         # fortran to python convention
         return value_str[1:-1].replace(&#34;&#39;&#39;&#34;, &#34;&#39;&#34;)
@@ -154,9 +161,9 @@ def _nml_value_to_python_value(value: str) -&gt; _nml_types:
         except ValueError:
             return float(value_str)
 
+
 ###############################################################################
-def _read_single_namelist(lines: List[str], parser: Parser,
-                          simple: bool) -&gt; Namelist:
+def _read_single_namelist(lines: List[str], parser: Parser, simple: bool) -&gt; Namelist:
     &#34;&#34;&#34;
     Read a namelist.
 
@@ -172,29 +179,33 @@ def _read_single_namelist(lines: List[str], parser: Parser,
     if simple:
         try:
 
-            namelist_name = lines[0].lstrip(&#39;&amp;&#39;).strip().lower()
+            namelist_name = lines[0].lstrip(&#34;&amp;&#34;).strip().lower()
             nml = Namelist({namelist_name: Namelist({})})
             for line in lines[1:]:
-                d = line.split(&#39;=&#39;, 1)
-                if (len(d) == 1):
-                    if d[0].strip()==&#39;/&#39;:
-                        break # end of the namelist
+                d = line.split(&#34;=&#34;, 1)
+                if len(d) == 1:
+                    if d[0].strip() == &#34;/&#34;:
+                        break  # end of the namelist
                     else:
-                        raise Exception(&#39;invalid line&#39;) # something else - not valid
-                elif (len(d) &gt;= 2):
-                    if d[0][0]==&#34;&#39;&#34; or d[0][0]==&#39;&#34;&#39;:
-                        raise Exception(&#39;invalid line&#39;) # = in a string - not valid
+                        # something else - not valid
+                        raise Exception(&#34;invalid line&#34;)
+                elif len(d) &gt;= 2:
+                    if d[0][0] == &#34;&#39;&#34; or d[0][0] == &#39;&#34;&#39;:
+                        # = in a string - not valid
+                        raise Exception(&#34;invalid line&#34;)
                     else:
                         path = d[0].strip()
 
-                        if &#39;:&#39; in path:
-                            raise Exception(&#39;invalid line&#39;) # can&#39;t read multiple entries at once - not valid
+                        if &#34;:&#34; in path:
+                            raise Exception(
+                                &#34;invalid line&#34;
+                            )  # can&#39;t read multiple entries at once - not valid
                         else:
                             # warning: it will still read lines like
                             # this: `a = 1,2,3` as a single string
 
                             # convert the string to a Python value:
-                            value = _nml_value_to_python_value(d[1].rstrip(&#39;, &#39;))
+                            value = _nml_value_to_python_value(d[1].rstrip(&#34;, &#34;))
 
                             # add this value to the namelist:
                             _pathSet(nml[namelist_name], path, value)
@@ -203,9 +214,10 @@ def _read_single_namelist(lines: List[str], parser: Parser,
             nml = None
 
     if nml is None:
-        nml = parser.reads(&#39;\n&#39;.join(lines))  # f90nml 1.1 and above
+        nml = parser.reads(&#34;\n&#34;.join(lines))  # f90nml 1.1 and above
 
     return nml
+
 
 ###############################################################################
 # def split_namelist_str(s: str):
@@ -232,21 +244,21 @@ def _read_single_namelist(lines: List[str], parser: Parser,
 
 ###############################################################################
 def _split_namelist_file(filename: str) -&gt; List[str]:
-    &#34;&#34;&#34; split a namelist file into an array of namelist strings &#34;&#34;&#34;
+    &#34;&#34;&#34;split a namelist file into an array of namelist strings&#34;&#34;&#34;
 
     namelists = list()
     i = -1
     started = False
-    with open(filename, &#39;r&#39;) as f:
+    with open(filename, &#34;r&#34;) as f:
         for line in f:
             line = line.strip()
-            if (len(line) &gt; 0):
-                if (line[0] != &#39;!&#39;):
-                    if (line[0] == &#39;&amp;&#39;):  # start a namelist
+            if len(line) &gt; 0:
+                if line[0] != &#34;!&#34;:
+                    if line[0] == &#34;&amp;&#34;:  # start a namelist
                         i = i + 1
                         namelists.append(list())
                         started = True
-                    elif (line[0:1] == &#39;/&#39;):  # end a namelist
+                    elif line[0:1] == &#34;/&#34;:  # end a namelist
                         started = False
                         namelists[i].append(line)
                         continue
@@ -255,10 +267,11 @@ def _split_namelist_file(filename: str) -&gt; List[str]:
 
     return namelists
 
+
 ###############################################################################
-def read_namelist(filename: str, *, n_threads: int = 0,
-                  parser: Parser = None,
-                  simple: bool = True) -&gt; Namelist:
+def read_namelist(
+    filename: str, *, n_threads: int = 0, parser: Parser = None, simple: bool = True
+) -&gt; Namelist:
     &#34;&#34;&#34;
     Read a namelist quickly.
 
@@ -291,8 +304,9 @@ def read_namelist(filename: str, *, n_threads: int = 0,
         pool_apply_async = pool.apply_async
 
         for lines in namelists:
-            results_append(pool_apply_async(_read_single_namelist,
-                                            (lines, parser, simple)))
+            results_append(
+                pool_apply_async(_read_single_namelist, (lines, parser, simple))
+            )
 
         pool.close()
         pool.join()
@@ -325,9 +339,9 @@ def read_namelist(filename: str, *, n_threads: int = 0,
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def read_namelist(filename: str, *, n_threads: int = 0,
-                  parser: Parser = None,
-                  simple: bool = True) -&gt; Namelist:
+<pre><code class="python">def read_namelist(
+    filename: str, *, n_threads: int = 0, parser: Parser = None, simple: bool = True
+) -&gt; Namelist:
     &#34;&#34;&#34;
     Read a namelist quickly.
 
@@ -360,8 +374,9 @@ def read_namelist(filename: str, *, n_threads: int = 0,
         pool_apply_async = pool.apply_async
 
         for lines in namelists:
-            results_append(pool_apply_async(_read_single_namelist,
-                                            (lines, parser, simple)))
+            results_append(
+                pool_apply_async(_read_single_namelist, (lines, parser, simple))
+            )
 
         pool.close()
         pool.join()
