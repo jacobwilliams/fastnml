@@ -15,7 +15,7 @@ _array_rg = re.compile(
 ###############################################################################
 
 
-def _get_array_index(s: str) -> Tuple(int, str):
+def _get_array_index(s: str) -> Tuple[int, str]:
     """
     If the variable name represents an array element (e.g., 'VAR(1)'),
     then return the array index (1-based) and the variable name.
