@@ -8,12 +8,13 @@ from io import TextIOWrapper
 ###############################################################################
 def _traverse_value(f: TextIOWrapper, path: str, sep: str, path2: str, d: Any):
 
-    if path.strip() != '':
-        path2 = f'{path}{sep}{path2}'
+    if path.strip() != "":
+        path2 = f"{path}{sep}{path2}"
     _traverse_dict(f, d, path2)
 
+
 ###############################################################################
-def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
+def _traverse_dict(f: TextIOWrapper, d: Any, path: str = "", sep: str = "%"):
     """
     traverse a dict and print the paths to each variable in namelist style
     """
@@ -24,8 +25,7 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
                 index = 0
                 for element in v:
                     index += 1
-                    _traverse_value(f, path, sep, f'{k}({index})',
-                                    element)
+                    _traverse_value(f, path, sep, f"{k}({index})", element)
             else:
                 _traverse_value(f, path, sep, k, v)
     elif isinstance(d, list):
@@ -33,7 +33,7 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
             _traverse_dict(f, element, path)
     else:
         path = path.lower()
-        if (d is None):
+        if d is None:
             pass
         elif isinstance(d, str):
             s = d.replace("'", "''")
@@ -45,13 +45,15 @@ def _traverse_dict(f: TextIOWrapper, d: Any, path: str = '', sep: str = '%'):
         elif isinstance(d, float):
             f.write(f" {path} = {d:.17E},\n")
 
+
 ###############################################################################
 def _print_single_namelist(f: TextIOWrapper, namelist_name: str, d: dict):
 
-    f.write(f'&{namelist_name.lower()}\n')
+    f.write(f"&{namelist_name.lower()}\n")
     _traverse_dict(f, d)
-    f.write('/\n')
-    f.write('\n')
+    f.write("/\n")
+    f.write("\n")
+
 
 ###############################################################################
 def _write_namelist_to_stream(d: dict, file: TextIOWrapper):
@@ -64,6 +66,7 @@ def _write_namelist_to_stream(d: dict, file: TextIOWrapper):
         elif isinstance(v, dict):
             _print_single_namelist(file, k, v)
 
+
 ###############################################################################
 def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     """
@@ -75,7 +78,7 @@ def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
     """
 
     if isinstance(file, str):
-        with open(file, 'w') as file:
+        with open(file, "w") as file:
             _write_namelist_to_stream(d, file)
     else:
         _write_namelist_to_stream(d, file)
