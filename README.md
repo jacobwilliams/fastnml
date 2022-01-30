@@ -16,7 +16,7 @@ Fastnml is available on [PyPI](https://pypi.org/project/fastnml/). So just `pip 
 
 ### Documentation
 
-The documentation for the current `master` branch can be found [here](https://jacobwilliams.github.io/fastnml/). This is generated with `pdoc3` by running `pdoc --html fastnml --force`.
+The API documentation for the current `master` branch can be found [here](https://jacobwilliams.github.io/fastnml/). This is generated with `pdoc3` by running `pdoc --html fastnml --force`.
 
 ### Dependencies
 
