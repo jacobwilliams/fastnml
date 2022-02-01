@@ -11,7 +11,8 @@ The `fastnml` code only works with a specific subset of the namelist format. It 
 
 ### Installing
 
-Fastnml is available on [PyPI](https://pypi.org/project/fastnml/). So just `pip install fastnml`.
+* Install from [PyPI](https://pypi.org/project/fastnml/) using pip: `pip install fastnml`
+* Install from [conda-forge](https://anaconda.org/conda-forge/fastnml) using conda: `conda install -c conda-forge fastnml`
 
 ### Documentation
 
@@ -24,3 +25,4 @@ The API documentation for the current `master` branch can be found [here](https:
  ### Other links
 
   * [Fastnml on PyPI](https://pypi.org/project/fastnml/)
+  * [fastnml-feedstock for conda-forge](https://github.com/conda-forge/fastnml-feedstock)
