@@ -3,8 +3,7 @@
 
 A Python library to quickly read Fortran namelists.
 
-![Build Status](https://github.com/jacobwilliams/fastnml/actions/workflows/unittest.yml/badge.svg)
-![Build Status](https://github.com/jacobwilliams/fastnml/actions/workflows/python-publish.yml/badge.svg)
+![Build Status](https://github.com/jacobwilliams/fastnml/actions/workflows/CI.yml/badge.svg)
 
 ### Description
 
