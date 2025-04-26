@@ -1,7 +1,7 @@
 fastnml: Python module for reading and writing Fortran namelists
 https://github.com/jacobwilliams/fastnml
 
-Copyright (c) 2019-2022, Jacob Williams
+Copyright (c) 2019-2025, Jacob Williams
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
