@@ -1,5 +1,6 @@
-![fastnml](media/fastnml.png)
-============
+<h1 align="center">
+<img src="https://raw.githubusercontent.com/jacobwilliams/fastnml/master/media/fastnml.png" width=800">
+</h1><br>
 
 A Python library to quickly read Fortran namelists.
 
