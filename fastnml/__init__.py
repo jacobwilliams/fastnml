@@ -30,7 +30,7 @@ If the simple parser fails, it defaults to using `f90nml` to read it.
 """
 
 __appname__ = "fastnml"
-__version__ = "2.0.1"
+__version__ = "2.0.2"
 __credits__ = ["Jacob Williams", "Randy Eckman"]
 __license__ = "BSD"
 
