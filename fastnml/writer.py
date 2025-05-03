@@ -68,15 +68,17 @@ def _write_namelist_to_stream(d: dict, file: TextIOWrapper):
 
 
 ###############################################################################
-def save_namelist(d: dict, file: Union[str, TextIOWrapper]):
-    """
-    Print a dict as a namelist file.
+def save_namelist(d: dict, file: Union[str, TextIOWrapper]) -> None:
+    """Print a dict as a namelist file.
     Assumes an `f90nml` namelist style structure
     (a dict of dicts, some of which can be lists).
 
     This uses the "simple" format, with one variable per line.
-    """
 
+    Args:
+        d (dict): the namelist data to write
+        file (Union[str, TextIOWrapper]): the file to write to. If a string, it is the filename.
+    """
     if isinstance(file, str):
         with open(file, "w") as file:
             _write_namelist_to_stream(d, file)

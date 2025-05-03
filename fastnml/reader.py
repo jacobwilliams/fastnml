@@ -6,6 +6,7 @@ from f90nml import Namelist, Parser
 import multiprocessing as mp
 import re
 from typing import List, Union, Tuple
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 _nml_types = Union[int, float, bool, str]
 _array_rg = re.compile(
@@ -16,10 +17,16 @@ _array_rg = re.compile(
 
 
 def _get_array_index(s: str) -> Tuple[int, str]:
-    """
-    If the variable name represents an array element (e.g., 'VAR(1)'),
+    """If the variable name represents an array element (e.g., 'VAR(1)'),
     then return the array index (1-based) and the variable name.
     Otherwise, return None.
+
+    Args:
+        s (str): variable name string, e.g., 'VAR(1)' or 'VAR'
+
+    Returns:
+        Tuple[int, str]: if it is an array element, then return (index, arrayname).
+            Otherwise, return (None, None).
     """
 
     # initial quick check:
@@ -38,10 +45,15 @@ def _get_array_index(s: str) -> Tuple[int, str]:
 
 
 ###############################################################################
-def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = "%"):
-    """
-    Sets a variable in a dictionary, given the namelist path string.
+def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = "%") -> None:
+    """Sets a variable in a dictionary, given the namelist path string.
     Assumes the input path uses Fortran-style 1-based indexing of arrays
+
+    Args:
+        dictionary (dict): the dictionary to set the value in
+        path (str): the namelist path string, e.g., "var1%var2(3)%var3"
+        value (_nml_types): the value to set, can be int, float, bool, or str
+        sep (str, optional): the path seperator character. Defaults to "%".
     """
 
     path = path.split(sep)
@@ -68,9 +80,16 @@ def _pathSet(dictionary: dict, path: str, value: _nml_types, sep: str = "%"):
 def _pathGet(
     dictionary: dict, path: str, sep: str = "%"
 ) -> Union[_nml_types, dict, list]:
-    """
-    Returns an item in a dictionary given the namelist path string.
+    """Returns an item in a dictionary given the namelist path string.
     Assumes the input path uses Fortran-style 1-based indexing of arrays
+
+    Args:
+        dictionary (dict): the dictionary to get the value from
+        path (str): the namelist path string, e.g., "var1%var2(3)%var3"
+        sep (str, optional): the path seperator character. Defaults to "%".
+
+    Returns:
+        Union[int, float, bool, str, dict, list]: the value at the given path.
     """
 
     for item in path.split(sep):
@@ -105,8 +124,13 @@ def _pathGet(
 
 ###############################################################################
 def _nml_value_to_python_value(value: str) -> _nml_types:
-    """
-    Convert the namelist value to a Python value.
+    """Convert the namelist value to a Python value.
+
+    Args:
+        value (str): the value from a namelist row as a string.
+
+    Returns:
+        Union[int, float, bool, str]: the value as a Python type.
     """
 
     value_str = value.strip()
@@ -135,8 +159,7 @@ def _nml_value_to_python_value(value: str) -> _nml_types:
 
 ###############################################################################
 def _read_single_namelist(lines: List[str], parser: Parser, simple: bool) -> Namelist:
-    """
-    Read a namelist.
+    """Read a namelist
 
     * Simple parser. Assumes one array element per line.
         For example: `val%a(2)%b = value,`
@@ -144,6 +167,17 @@ def _read_single_namelist(lines: List[str], parser: Parser, simple: bool) -> Nam
         to using f90nml to read it.
 
     Note that comment lines and blank lines have already been removed.
+
+    Args:
+        lines (List[str]): the lines of the namelist file,
+        parser (Parser): The (`f90nml`) parser to fall back to if the simple parser fails.
+        simple (bool): if the simple parser should be tried first.
+
+    Raises:
+        Exception: invalid line in the namelist.
+
+    Returns:
+        Namelist: the resulant namelist object from parsing the lines.
     """
 
     nml = None
@@ -168,9 +202,8 @@ def _read_single_namelist(lines: List[str], parser: Parser, simple: bool) -> Nam
                         path = d[0].strip()
 
                         if ":" in path:
-                            raise Exception(
-                                "invalid line"
-                            )  # can't read multiple entries at once - not valid
+                            # can't read multiple entries at once - not valid
+                            raise Exception("invalid line")
                         else:
                             # warning: it will still read lines like
                             # this: `a = 1,2,3` as a single string
@@ -214,8 +247,15 @@ def _read_single_namelist(lines: List[str], parser: Parser, simple: bool) -> Nam
 #     return namelists
 
 ###############################################################################
-def _split_namelist_file(filename: str) -> List[str]:
-    """split a namelist file into an array of namelist strings"""
+def _split_namelist_file(filename: str) -> List[list]:
+    """split a namelist file into an array of namelist strings
+
+    Args:
+        filename (str): the name of the namelist file to read.
+
+    Returns:
+        List[list]: each element is a list of lines of a namelist in the file.
+    """
 
     namelists = list()
     i = -1
@@ -243,12 +283,17 @@ def _split_namelist_file(filename: str) -> List[str]:
 def read_namelist(
     filename: str, *, n_threads: int = 0, parser: Parser = None, simple: bool = True
 ) -> Namelist:
-    """
-    Read a namelist quickly.
+    """Read a namelist quickly.
 
-    For threaded use, set `n_threads` to the number of threads.
-    """
+    Args:
+        filename (str): the name of the namelist file to read.
+        n_threads (int, optional): For threaded use, set `n_threads` to the number of threads. Defaults to 0.
+        parser (Parser, optional): The (`f90nml`) parser to fall back to if the simple parser fails. Defaults to None.
+        simple (bool): if the simple parser should be tried first.
 
+    Returns:
+        Namelist: the resulting namelist object from parsing the file.
+    """
     nml = Namelist({})
 
     def _loop_over_results(r):
@@ -278,10 +323,8 @@ def read_namelist(
             results_append(
                 pool_apply_async(_read_single_namelist, (lines, parser, simple))
             )
-
         pool.close()
         pool.join()
-
         for r in results:
             _loop_over_results(r.get())
     else:
