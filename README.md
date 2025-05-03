@@ -13,10 +13,23 @@ https://anaconda.org/conda-forge/fastnml)
 
 The `fastnml` code only works with a specific subset of the namelist format. It is not nearly as general or robust as [f90nml](https://github.com/marshallward/f90nml), but it is much faster when reading very large namelists. Also, both codes are tested using multiprocessing to read many namelists in parallel.
 
+This library assumes the namelist is written one value per line.
+This includes all types and array elements.  For example:
+```fortran
+&nml
+ a = 1,
+ c%a(1)%b = 1.0,
+ c%a(2)%b = 1.0,
+ d(1) = 2,
+ d(2) = 3
+/
+```
+If the simple parser fails, it defaults to using `f90nml` to read it.
+
 ### Installing
 
-* Install from [PyPI](https://pypi.org/project/fastnml/) using pip: `pip install fastnml`
-* Install from [conda-forge](https://anaconda.org/conda-forge/fastnml) using conda: `conda install -c conda-forge fastnml`
+  * Install from [PyPI](https://pypi.org/project/fastnml/) using pip: `pip install fastnml`
+  * Install from [conda-forge](https://anaconda.org/conda-forge/fastnml) using conda: `conda install -c conda-forge fastnml`
 
 ### Documentation
 
@@ -24,9 +37,9 @@ The API documentation for the current `master` branch can be found [here](https:
 
 ### Dependencies
 
- * [f90nml](https://github.com/marshallward/f90nml) -- the more general library
+  * [f90nml](https://github.com/marshallward/f90nml) -- the more general library
 
- ### Other links
+### Other links
 
   * [Fastnml on PyPI](https://pypi.org/project/fastnml/)
   * [Fastnml on conda-forge](https://anaconda.org/conda-forge/fastnml)
