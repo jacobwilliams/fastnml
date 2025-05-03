@@ -29,4 +29,5 @@ The API documentation for the current `master` branch can be found [here](https:
  ### Other links
 
   * [Fastnml on PyPI](https://pypi.org/project/fastnml/)
+  * [Fastnml on conda-forge](https://anaconda.org/conda-forge/fastnml)
   * [fastnml-feedstock for conda-forge](https://github.com/conda-forge/fastnml-feedstock)
